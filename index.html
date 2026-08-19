@@ -6,6 +6,61 @@
 <title>Cost Diary | Cost Reference</title>
 <meta name="description" content="구매·공사 원가 기준정보 통합조회">
 <style>
+  .rateTableCard{
+  grid-column:1/-1;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:19px;
+  padding:20px;
+}
+.rateTableTitle{
+  font-size:21px;
+  font-weight:700;
+  margin-top:6px;
+}
+.rateTableSub{
+  font-size:13px;
+  color:var(--muted);
+  margin:5px 0 16px;
+}
+.rateTableWrap{
+  overflow-x:auto;
+}
+.rateTable{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  min-width:620px;
+}
+.rateTable th,
+.rateTable td{
+  padding:11px 12px;
+  border-bottom:1px solid var(--line);
+  text-align:center;
+}
+.rateTable th{
+  background:#f8fafc;
+  color:#475467;
+  font-weight:700;
+}
+.rateTable th:first-child,
+.rateTable td:first-child{
+  text-align:left;
+  font-weight:700;
+}
+.rateTable td:not(:first-child){
+  font-size:15px;
+  font-weight:700;
+  color:#111827;
+}
+.rateTableMeta{
+  margin-top:14px;
+  padding-top:11px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.7;
+}
 :root{--bg:#f4f6f8;--card:#fff;--text:#111827;--muted:#667085;--line:#e5e7eb;--blue:#2563eb;--green:#067647;--red:#b42318;--dark:#111827}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif}
 .wrap{max-width:980px;margin:auto;padding:30px 16px 64px}.hero{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
@@ -103,7 +158,200 @@ function history(x,m){
 
  return`<div class="history"><div class="historyTitle">${title} 추이</div>${a.map((z,i)=>`<div class="hist ${i===0?"latestHist":""}"><span>${label(z)}${i===0?' <em class="latestBadge">N</em>':""}</span><div class="bar"><div class="fill ${i===0?"latestFill":""}" style="width:${mx?Math.max(8,num(z.value)/mx*100):0}%"></div></div><b>${fmt(z.value)}</b></div>`).join("")}</div>`
 }
-function render(){let m=maps(),terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),base=yf.value==="latest"?latest():rows.slice();let a=base.filter(x=>{if(cat!=="all"&&x.category!==cat)return false;if(yf.value!=="latest"&&yf.value!=="all"&&String(x.year)!==yf.value)return false;if(pf.value!=="all"&&x.period!==pf.value)return false;let h=[x.name,x.grade,x.subcategory,x.category_label,x.source,x.note,...(Array.isArray(x.keywords)?x.keywords:[])].filter(Boolean).join(" ").toLowerCase();return terms.every(t=>h.includes(t))}).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));status.textContent=`${a.length.toLocaleString()}개 기준값 조회됨`;grid.innerHTML=a.length?a.map(x=>`<article class="card"><div class="cat">${x.category_label||""}</div><div class="name">${x.name||""}${x.grade?" · "+x.grade:""}</div><div class="sub">${x.subcategory||""}</div><div class="val">${fmt(x.value)} <span class="unit">${x.unit||""}</span></div>${comparison(x,m)}${history(x,m)}<div class="meta">기준: ${x.year||""}년 ${x.period||""}<br>적용일: ${x.effective_date||"-"}<br>출처: ${x.source||"-"}</div></article>`).join(""):'<div class="empty">검색 결과가 없습니다.</div>'}
+function indirectLaborTable(data){
+
+  const a=data
+    .filter(x =>
+      x.category==="pps" &&
+      x.name==="간접노무비" &&
+      x.construction_type==="산업설비"
+    )
+    .sort((x,y)=>
+      num(x.amount_min)-num(y.amount_min) ||
+      num(x.period_min_days)-num(y.period_min_days)
+    );
+
+  if(!a.length)return"";
+
+  const amountBands=[
+    {
+      label:"10억 미만",
+      min:0,
+      max:1000000000
+    },
+    {
+      label:"10~50억 미만",
+      min:1000000000,
+      max:5000000000
+    },
+    {
+      label:"50~300억 미만",
+      min:5000000000,
+      max:30000000000
+    }
+  ];
+
+  const periods=[
+    {label:"6개월 이하",min:0,max:183},
+    {label:"7~12개월",min:184,max:365},
+    {label:"13~36개월",min:366,max:1095},
+    {label:"36개월 초과",min:1096,max:null}
+  ];
+
+  function getRate(b,p){
+    const r=a.find(x =>
+      num(x.amount_min)===b.min &&
+      num(x.amount_max)===b.max &&
+      num(x.period_min_days)===p.min &&
+      (
+        p.max===null
+          ? x.period_max_days===null
+          : num(x.period_max_days)===p.max
+      )
+    );
+
+    return r ? `${fmt(r.value)}%` : "-";
+  }
+
+  const latest=a[0];
+
+  return `
+    <article class="rateTableCard">
+
+      <div class="cat">조달청 분석요율</div>
+
+      <div class="rateTableTitle">
+        간접노무비
+      </div>
+
+      <div class="rateTableSub">
+        산업설비 · 직접공사비 / 공사기간별 적용요율
+      </div>
+
+      <div class="rateTableWrap">
+        <table class="rateTable">
+          <thead>
+            <tr>
+              <th>직접공사비</th>
+              ${periods.map(p=>`<th>${p.label}</th>`).join("")}
+            </tr>
+          </thead>
+
+          <tbody>
+            ${amountBands.map(b=>`
+              <tr>
+                <td>${b.label}</td>
+                ${periods.map(p=>`
+                  <td>${getRate(b,p)}</td>
+                `).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rateTableMeta">
+        적용기준: 직접노무비 × 해당 요율<br>
+        적용일: ${latest?.effective_date||"-"}<br>
+        출처: ${latest?.source||"조달청"}
+      </div>
+
+    </article>
+  `;
+}
+ function render(){
+
+  let m=maps(),
+      terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),
+      base=yf.value==="latest"?latest():rows.slice();
+
+  let a=base.filter(x=>{
+
+    if(cat!=="all"&&x.category!==cat)return false;
+
+    if(
+      yf.value!=="latest" &&
+      yf.value!=="all" &&
+      String(x.year)!==yf.value
+    )return false;
+
+    if(pf.value!=="all"&&x.period!==pf.value)return false;
+
+    let h=[
+      x.name,
+      x.grade,
+      x.subcategory,
+      x.category_label,
+      x.source,
+      x.note,
+      ...(Array.isArray(x.keywords)?x.keywords:[])
+    ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+    return terms.every(t=>h.includes(t));
+
+  }).sort((a,b)=>
+    (a.name||"").localeCompare(b.name||"","ko")
+  );
+
+  // 간접노무비는 개별 카드에서 제외
+  const normalRows=a.filter(x=>
+    !(
+      x.category==="pps" &&
+      x.name==="간접노무비" &&
+      x.construction_type==="산업설비"
+    )
+  );
+
+  let html="";
+
+  // 법정경비 탭 또는 전체에서 간접노무비 표 표시
+  if(cat==="pps" || cat==="all"){
+    html+=indirectLaborTable(rows);
+  }
+
+  html+=normalRows.map(x=>`
+    <article class="card">
+
+      <div class="cat">
+        ${x.category_label||""}
+      </div>
+
+      <div class="name">
+        ${x.name||""}${x.grade?" · "+x.grade:""}
+      </div>
+
+      <div class="sub">
+        ${x.subcategory||""}
+      </div>
+
+      <div class="val">
+        ${fmt(x.value)}
+        <span class="unit">${x.unit||""}</span>
+      </div>
+
+      ${comparison(x,m)}
+
+      ${history(x,m)}
+
+      <div class="meta">
+        기준: ${x.year||""}년 ${x.period||""}<br>
+        적용일: ${x.effective_date||"-"}<br>
+        출처: ${x.source||"-"}
+      </div>
+
+    </article>
+  `).join("");
+
+  status.textContent=
+    `${a.length.toLocaleString()}개 기준값 조회됨`;
+
+  grid.innerHTML=
+    html ||
+    '<div class="empty">검색 결과가 없습니다.</div>';
+}
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(z=>z.classList.remove("on"));b.classList.add("on");cat=b.dataset.c;render()});q.oninput=render;yf.onchange=render;pf.onchange=render;
 (async()=>{
   try{
@@ -150,7 +398,15 @@ document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelect
         ].filter(Boolean).join(" · "),
 
         grade:null,
-
+construction_type:x.construction_type,
+construction_subtype:x.construction_subtype,
+amount_min:x.amount_min,
+amount_max:x.amount_max,
+period_min_days:x.period_min_days,
+period_max_days:x.period_max_days,
+calculation_base:x.calculation_base,
+formula_text:x.formula_text,
+base_amount:x.base_amount,
         value:x.rate,
         unit:"%",
 
