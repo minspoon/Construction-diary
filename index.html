@@ -583,6 +583,20 @@ footer{
   padding:6px 9px;
 }
 
+/* =====================================================
+   시장지표
+===================================================== */
+.marketToolbar{grid-column:1/-1;display:flex;gap:7px;overflow-x:auto;padding:2px 0 2px}
+.marketSubTab{appearance:none;border:1px solid var(--line);background:#fff;color:#475467;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}
+.marketSubTab.on{background:var(--dark);border-color:var(--dark);color:#fff}
+.marketCard{padding:16px}
+.marketCard .name{font-size:17px}
+.marketCard .val{font-size:27px;margin-top:11px}
+.marketDate{margin-top:9px;color:var(--muted);font-size:11px}
+.marketChange{display:inline-block;margin-top:9px;border-radius:999px;padding:5px 8px;background:#f2f4f7;font-size:11.5px;font-weight:800}
+.marketChange.up{background:#ecfdf3;color:var(--green)}
+.marketChange.down{background:#fef3f2;color:var(--red)}
+
 @media(max-width:680px){
   .grid{grid-template-columns:1fr}
   .filters{grid-template-columns:1fr}
@@ -644,6 +658,13 @@ footer{
     font-size:11px;
   }
 }
+@media(max-width:680px){
+  .grid.marketMode{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .grid.marketMode .marketToolbar{grid-column:1/-1}
+  .marketCard{padding:13px}
+  .marketCard .name{font-size:15px}
+  .marketCard .val{font-size:22px}
+}
 </style>
 </head>
 
@@ -668,12 +689,13 @@ footer{
 >
 
 <div class="tabs">
-  <button class="tab on" data-c="all">전체</button>
+  <button class="tab on" data-c="market">시장지표</button>
   <button class="tab" data-c="labor">개별직종 노임단가(공사)</button>
   <button class="tab" data-c="engineering">엔지니어링(설계)</button>
   <button class="tab" data-c="pps">법정경비</button>
   <button class="tab" data-c="price_index">물가지수</button>
   <button class="tab" data-c="minimum_wage">최저임금</button>
+  <button class="tab" data-c="all">전체</button>
 </div>
 
 <div class="filters">
@@ -710,7 +732,9 @@ footer{
 <script>
 
 let rows=[];
-let cat="all";
+let cat="market";
+let marketRows=[];
+let marketType="전체";
 let engineeringType="전체보기";
 
 const q=document.getElementById("q");
@@ -2317,10 +2341,57 @@ function minimumWageCard(data){
 
 
 /* =====================================================
+   시장지표
+===================================================== */
+function marketGroup(x){
+  const sym=String(x.symbol||"").toUpperCase();
+  if(["DJIA","NASDAQ","SP500"].includes(sym)) return "미국증시";
+  if(["USDKRW","JPYKRW","EURKRW","CNYKRW"].includes(sym)) return "환율";
+  if(["LMEALC","LMECOC","LMENIC","LMEZINC"].includes(sym)) return "비철금속";
+  if(["BRENTF","DUBAIF"].includes(sym)) return "에너지";
+  return "기타";
+}
+function marketTabs(){
+  const types=["전체","미국증시","환율","비철금속","에너지"];
+  return `<div class="marketToolbar">${types.map(t=>`<button type="button" class="marketSubTab ${marketType===t?"on":""}" onclick="setMarketType('${t}')">${t}</button>`).join("")}</div>`;
+}
+function setMarketType(type){ marketType=type; render(); }
+function marketUnit(x){
+  const g=marketGroup(x);
+  if(g==="환율") return "원";
+  if(g==="비철금속") return "USD/톤";
+  if(g==="에너지") return "USD/배럴";
+  return "";
+}
+function marketSection(){
+  let a=marketRows.slice();
+  if(marketType!=="전체") a=a.filter(x=>marketGroup(x)===marketType);
+  const terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  a=a.filter(x=>{ const h=[x.name,x.symbol,marketGroup(x)].filter(Boolean).join(" ").toLowerCase(); return terms.every(t=>h.includes(t)); });
+  const order=["DJIA","NASDAQ","SP500","USDKRW","JPYKRW","EURKRW","CNYKRW","LMECOC","LMEALC","LMENIC","LMEZINC","BRENTF","DUBAIF"];
+  a.sort((x,y)=>order.indexOf(x.symbol)-order.indexOf(y.symbol));
+  const cards=a.map(x=>{
+    const ch=Number(x.change_pct);
+    const c=Number.isFinite(ch)?(ch>0?"up":ch<0?"down":""):"";
+    const ct=Number.isFinite(ch)?`${ch>0?"+":""}${ch.toFixed(2)}%`:"-";
+    return `<article class="card marketCard"><div class="cat">${marketGroup(x)}</div><div class="name">${x.name||x.symbol||""}</div><div class="sub">${x.symbol||""}</div><div class="val">${fmt(x.value)} <span class="unit">${marketUnit(x)}</span></div><div class="marketChange ${c}">전일 대비 ${ct}</div><div class="marketDate">기준일 ${x.market_date||x.effective_date||"-"} · 한국경제 데이터센터</div></article>`;
+  }).join("");
+  return marketTabs()+cards;
+}
+
+/* =====================================================
    메인 렌더
 ===================================================== */
 
 function render(){
+
+  if(cat==="market"){
+    grid.classList.add("marketMode");
+    grid.innerHTML=marketSection() || '<div class="empty">시장지표 데이터가 없습니다.</div>';
+    status.textContent=`${marketRows.length.toLocaleString()}개 시장지표 · 최신 기준`;
+    return;
+  }
+  grid.classList.remove("marketMode");
 
   let m=maps();
 
@@ -2846,6 +2917,23 @@ async function updateVisitorCount(s){
 
     if(standardsRes.error)
       throw standardsRes.error;
+
+    /* 시장지표 - market-worker가 저장한 최신 13종 */
+    const marketRes=await s
+      .from("market_data")
+      .select("*")
+      .order("market_date",{ascending:false});
+
+    if(marketRes.error){
+      console.warn("market_data load error",marketRes.error);
+      marketRows=[];
+    }else{
+      const mm=new Map();
+      (marketRes.data||[]).forEach(x=>{
+        if(!mm.has(x.symbol)) mm.set(x.symbol,x);
+      });
+      marketRows=[...mm.values()];
+    }
 
 
     /*
