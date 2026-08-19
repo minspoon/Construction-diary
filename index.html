@@ -5,54 +5,331 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cost Diary | Cost Reference</title>
 <meta name="description" content="구매·공사 원가 기준정보 통합조회">
+
 <style>
-  .rateTableCard{
+:root{
+  --bg:#f4f6f8;
+  --card:#fff;
+  --text:#111827;
+  --muted:#667085;
+  --line:#e5e7eb;
+  --blue:#2563eb;
+  --green:#067647;
+  --red:#b42318;
+  --dark:#111827;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+}
+
+.wrap{
+  max-width:980px;
+  margin:auto;
+  padding:30px 16px 64px;
+}
+
+.hero{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:flex-start;
+}
+
+.kicker{
+  font-size:11px;
+  font-weight:900;
+  color:var(--blue);
+  letter-spacing:.12em;
+}
+
+h1{
+  margin:6px 0;
+  font-size:clamp(34px,7vw,50px);
+  letter-spacing:-.05em;
+}
+
+.desc{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.brand{
+  background:var(--dark);
+  color:white;
+  padding:9px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+}
+
+.panel{
+  margin-top:22px;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+}
+
+#q{
+  width:100%;
+  border:0;
+  outline:0;
+  padding:10px 7px;
+  font-size:17px;
+  background:transparent;
+}
+
+.tabs{
+  display:flex;
+  gap:7px;
+  overflow:auto;
+  padding-top:8px;
+}
+
+.tab{
+  border:1px solid var(--line);
+  background:white;
+  border-radius:999px;
+  padding:9px 12px;
+  white-space:nowrap;
+  font-weight:800;
+  color:#475467;
+}
+
+.tab.on{
+  background:var(--dark);
+  border-color:var(--dark);
+  color:white;
+}
+
+.filters{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+
+select{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:white;
+  padding:10px;
+}
+
+.status{
+  margin:15px 2px 10px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:19px;
+  padding:18px;
+}
+
+.cat{
+  font-size:12px;
+  color:var(--blue);
+  font-weight:900;
+}
+
+.name{
+  font-size:20px;
+  font-weight:700;
+  margin-top:6px;
+}
+
+.sub{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.val{
+  font-size:31px;
+  font-weight:700;
+  letter-spacing:-.04em;
+  margin-top:16px;
+}
+
+.unit{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+.compare{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:11px;
+}
+
+.pill{
+  font-size:11.5px;
+  border-radius:999px;
+  padding:6px 8px;
+  background:#f2f4f7;
+  font-weight:800;
+}
+
+.up{
+  background:#ecfdf3;
+  color:var(--green);
+}
+
+.down{
+  background:#fef3f2;
+  color:var(--red);
+}
+
+.history{
+  margin-top:13px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+}
+
+.historyTitle{
+  font-size:12px;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.hist{
+  display:grid;
+  grid-template-columns:72px minmax(70px,1fr) auto;
+  gap:8px;
+  align-items:center;
+  font-size:12px;
+  padding:5px 0;
+}
+
+.hist>span{white-space:nowrap}
+
+.bar{
+  height:7px;
+  background:#e8eef8;
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.fill{
+  height:100%;
+  background:var(--blue);
+  border-radius:99px;
+}
+
+.latestHist{
+  background:#f8fbff;
+  border-radius:10px;
+  padding:7px 8px;
+}
+
+.latestBadge{
+  font-style:normal;
+  font-size:10px;
+  color:#dc2626;
+  font-weight:900;
+}
+
+.fill.latestFill{
+  background:#111827;
+}
+
+.meta{
+  border-top:1px solid var(--line);
+  margin-top:14px;
+  padding-top:11px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.7;
+}
+
+.empty,.error{
+  grid-column:1/-1;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:30px;
+  text-align:center;
+  color:var(--muted);
+}
+
+
+/* =====================================================
+   공통 요율표
+===================================================== */
+
+.rateTableCard{
   grid-column:1/-1;
   background:#fff;
   border:1px solid var(--line);
   border-radius:19px;
   padding:20px;
 }
+
 .rateTableTitle{
   font-size:21px;
   font-weight:700;
   margin-top:6px;
 }
+
 .rateTableSub{
   font-size:13px;
   color:var(--muted);
   margin:5px 0 16px;
 }
+
 .rateTableWrap{
   overflow-x:auto;
 }
+
 .rateTable{
   width:100%;
   border-collapse:collapse;
   font-size:13px;
   min-width:620px;
 }
+
 .rateTable th,
 .rateTable td{
   padding:11px 12px;
   border-bottom:1px solid var(--line);
   text-align:center;
 }
+
 .rateTable th{
   background:#f8fafc;
   color:#475467;
   font-weight:700;
 }
+
 .rateTable th:first-child,
 .rateTable td:first-child{
   text-align:left;
   font-weight:700;
 }
+
 .rateTable td:not(:first-child){
   font-size:15px;
   font-weight:700;
   color:#111827;
 }
+
 .rateTableMeta{
   margin-top:14px;
   padding-top:11px;
@@ -62,114 +339,544 @@
   line-height:1.7;
 }
 
-.rateExtra{display:block;margin-top:3px;font-size:11px;font-weight:600;color:var(--muted)}
-.rateMulti{min-width:210px}
-.rateSplit{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:3px 0;font-size:11px;color:var(--muted)}
-.rateSplit+ .rateSplit{border-top:1px dashed var(--line);margin-top:4px;padding-top:7px}
-.rateSplit strong{font-size:14px;color:var(--text);white-space:nowrap}
-.safetyTable td{vertical-align:middle}
+.rateExtra{
+  display:block;
+  margin-top:3px;
+  font-size:11px;
+  font-weight:600;
+  color:var(--muted);
+}
 
-:root{--bg:#f4f6f8;--card:#fff;--text:#111827;--muted:#667085;--line:#e5e7eb;--blue:#2563eb;--green:#067647;--red:#b42318;--dark:#111827}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif}
-.wrap{max-width:980px;margin:auto;padding:30px 16px 64px}.hero{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
-.kicker{font-size:11px;font-weight:900;color:var(--blue);letter-spacing:.12em}h1{margin:6px 0;font-size:clamp(34px,7vw,50px);letter-spacing:-.05em}.desc{color:var(--muted);font-size:14px}.brand{background:var(--dark);color:white;padding:9px 12px;border-radius:999px;font-size:12px;font-weight:900}
-.panel{margin-top:22px;background:white;border:1px solid var(--line);border-radius:20px;padding:14px}#q{width:100%;border:0;outline:0;padding:10px 7px;font-size:17px;background:transparent}
-.tabs{display:flex;gap:7px;overflow:auto;padding-top:8px}.tab{border:1px solid var(--line);background:white;border-radius:999px;padding:9px 12px;white-space:nowrap;font-weight:800;color:#475467}.tab.on{background:var(--dark);border-color:var(--dark);color:white}
-.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}select{border:1px solid var(--line);border-radius:12px;background:white;padding:10px}
-.status{margin:15px 2px 10px;color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.card{background:white;border:1px solid var(--line);border-radius:19px;padding:18px}
-.cat{font-size:12px;color:var(--blue);font-weight:900}.name{font-size:20px;font-weight:700;margin-top:6px}.sub{font-size:13px;color:var(--muted);margin-top:4px}.val{font-size:31px;font-weight:700;letter-spacing:-.04em;margin-top:16px}.unit{font-size:12px;color:var(--muted);font-weight:600}
-.compare{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.pill{font-size:11.5px;border-radius:999px;padding:6px 8px;background:#f2f4f7;font-weight:800}.up{background:#ecfdf3;color:var(--green)}.down{background:#fef3f2;color:var(--red)}
-.history{margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}.historyTitle{font-size:12px;font-weight:900;margin-bottom:7px}.hist{display:grid;grid-template-columns:72px minmax(70px,1fr) auto;gap:8px;align-items:center;font-size:12px;padding:5px 0}.hist>span{white-space:nowrap}.bar{height:7px;background:#e8eef8;border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--blue);border-radius:99px}.latestHist{background:#f8fbff;border-radius:10px;padding:7px 8px}.latestBadge{font-style:normal;font-size:10px;color:#dc2626;background:transparent;padding:0;margin-left:2px;border-radius:0;font-weight:900;white-space:nowrap}.fill.latestFill{background:#111827}
-.meta{border-top:1px solid var(--line);margin-top:14px;padding-top:11px;color:var(--muted);font-size:12px;line-height:1.7}.empty,.error{grid-column:1/-1;background:white;border:1px solid var(--line);border-radius:18px;padding:30px;text-align:center;color:var(--muted)}
-footer{margin-top:24px;color:var(--muted);font-size:11px;line-height:1.6}@media(max-width:680px){.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.hero{display:block}.brand{display:inline-block;margin-top:12px}}
+.rateMulti{
+  min-width:210px;
+}
+
+.rateSplit{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  padding:3px 0;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.rateSplit+.rateSplit{
+  border-top:1px dashed var(--line);
+  margin-top:4px;
+  padding-top:7px;
+}
+
+.rateSplit strong{
+  font-size:14px;
+  color:var(--text);
+  white-space:nowrap;
+}
+
+.safetyTable td{
+  vertical-align:middle;
+}
+
+
+/* =====================================================
+   엔지니어링
+===================================================== */
+
+.engTabs{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  padding:2px 0 14px;
+}
+
+.engTab{
+  appearance:none;
+  border:1px solid var(--line);
+  background:#fff;
+  color:#475467;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+.engTab:hover{
+  background:#f8fafc;
+}
+
+.engTab.on{
+  background:#111827;
+  color:#fff;
+  border-color:#111827;
+}
+
+.engSimpleTable{
+  min-width:420px;
+}
+
+.engSimpleTable th:first-child,
+.engSimpleTable td:first-child{
+  width:55%;
+}
+
+.engSimpleTable td:last-child{
+  text-align:right;
+  font-size:16px;
+}
+
+.engValue{
+  font-weight:700;
+}
+
+.engUnit{
+  margin-left:3px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+}
+
+.engAllTable{
+  min-width:920px;
+}
+
+.engAllTable td{
+  white-space:nowrap;
+}
+
+footer{
+  margin-top:24px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.6;
+}
+
+@media(max-width:680px){
+  .grid{grid-template-columns:1fr}
+  .filters{grid-template-columns:1fr}
+  .hero{display:block}
+  .brand{display:inline-block;margin-top:12px}
+
+  .rateTableCard{
+    padding:17px;
+  }
+
+  .rateTableTitle{
+    font-size:20px;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
-<header class="hero"><div><div class="kicker">COST REFERENCE DATA</div><h1>Cost Diary</h1><div class="desc">구매·공사 원가 기준정보 통합조회</div></div><div class="brand">Cost Reference</div></header>
+
+<header class="hero">
+  <div>
+    <div class="kicker">COST REFERENCE DATA</div>
+    <h1>Cost Diary</h1>
+    <div class="desc">구매·공사 원가 기준정보 통합조회</div>
+  </div>
+  <div class="brand">Cost Reference</div>
+</header>
+
 <section class="panel">
-<input id="q" placeholder="예: 플랜트배관공, 최저임금, 건설공사비지수, 전선및케이블">
+
+<input
+  id="q"
+  placeholder="예: 플랜트배관공, 최저임금, 건설공사비지수, 전선및케이블"
+>
+
 <div class="tabs">
-<button class="tab on" data-c="all">전체</button>
-<button class="tab" data-c="labor">개별직종 노임단가</button>
-<button class="tab" data-c="minimum_wage">최저임금</button>
-<button class="tab" data-c="pps">법정경비</button>
-<button class="tab" data-c="engineering">엔지니어링</button><button class="tab" data-c="price_index">물가지수</button>
+  <button class="tab on" data-c="all">전체</button>
+  <button class="tab" data-c="labor">개별직종 노임단가</button>
+  <button class="tab" data-c="minimum_wage">최저임금</button>
+  <button class="tab" data-c="pps">법정경비</button>
+  <button class="tab" data-c="engineering">엔지니어링</button>
+  <button class="tab" data-c="price_index">물가지수</button>
 </div>
-<div class="filters"><select id="year"><option value="latest">최신 기준</option><option value="all">전체 연도</option></select><select id="period"><option value="all">전체 적용기간</option></select></div>
+
+<div class="filters">
+
+<select id="year">
+  <option value="latest">최신 기준</option>
+  <option value="all">전체 연도</option>
+</select>
+
+<select id="period">
+  <option value="all">전체 적용기간</option>
+</select>
+
+</div>
+
 </section>
-<div id="status" class="status">데이터 불러오는 중...</div><main id="grid" class="grid"></main>
-<footer>공식 공표자료 기준 · 출처 및 적용일 관리 · 노임/최저임금/법정경비/엔지니어링/월별 물가지수 변동률 자동 계산</footer>
+
+<div id="status" class="status">
+데이터 불러오는 중...
 </div>
+
+<main id="grid" class="grid"></main>
+
+<footer>
+공식 공표자료 기준 · 출처 및 적용일 관리 · 노임/최저임금/법정경비/엔지니어링/월별 물가지수 변동률 자동 계산
+</footer>
+
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./config.js"></script>
+
 <script>
-let rows=[],cat="all";
-const q=document.getElementById("q"),grid=document.getElementById("grid"),status=document.getElementById("status"),yf=document.getElementById("year"),pf=document.getElementById("period");
-const num=v=>Number(v), fmt=v=>Number.isFinite(num(v))?num(v).toLocaleString("ko-KR",{maximumFractionDigits:6}):v;
+
+let rows=[];
+let cat="all";
+let engineeringType="기계·설비";
+
+const q=document.getElementById("q");
+const grid=document.getElementById("grid");
+const status=document.getElementById("status");
+const yf=document.getElementById("year");
+const pf=document.getElementById("period");
+
+const num=v=>Number(v);
+
+const fmt=v=>
+  Number.isFinite(num(v))
+    ? num(v).toLocaleString("ko-KR",{maximumFractionDigits:6})
+    : v;
+
+
+/* =====================================================
+   기본 함수
+===================================================== */
+
 function rank(x){
+
   if(x.effective_date){
+
     const t=Date.parse(x.effective_date);
-    if(!Number.isNaN(t)) return t;
+
+    if(!Number.isNaN(t))
+      return t;
   }
-  return num(x.year)*10+(x.period==="하반기"?2:x.period==="상반기"?1:3)
+
+  return num(x.year)*10+
+    (
+      x.period==="하반기"
+        ?2
+        :x.period==="상반기"
+          ?1
+          :3
+    );
 }
-function key(x){return[x.category,x.subcategory||"",x.name||"",x.grade||"",x.unit||""].join("|")}
-function maps(){const m=new Map();rows.forEach(x=>{let k=key(x);if(!m.has(k))m.set(k,[]);m.get(k).push(x)});m.forEach(a=>a.sort((a,b)=>rank(a)-rank(b)));return m}
-function pc(a,b){return b&&num(b)!==0?(num(a)-num(b))/num(b)*100:null}
-function pt(v){return v===null?"-":(v>0?"+":"")+v.toFixed(2)+"%"}
-function cls(v){return"pill "+(v===null?"":v>0?"up":v<0?"down":"")}
-function latest(){let o=[];maps().forEach(a=>o.push(a[a.length-1]));return o}
-function filters(){let ys=[...new Set(rows.map(x=>x.year).filter(Boolean))].sort((a,b)=>b-a),ps=[...new Set(rows.map(x=>x.period).filter(Boolean))];yf.innerHTML='<option value="latest">최신 기준</option><option value="all">전체 연도</option>'+ys.map(y=>`<option>${y}</option>`).join("");pf.innerHTML='<option value="all">전체 적용기간</option>'+ps.map(p=>`<option>${p}</option>`).join("")}
+
+
+function key(x){
+
+  return[
+    x.category,
+    x.subcategory||"",
+    x.name||"",
+    x.grade||"",
+    x.unit||""
+  ].join("|");
+}
+
+
+function maps(){
+
+  const m=new Map();
+
+  rows.forEach(x=>{
+
+    let k=key(x);
+
+    if(!m.has(k))
+      m.set(k,[]);
+
+    m.get(k).push(x);
+
+  });
+
+  m.forEach(a=>
+    a.sort((a,b)=>rank(a)-rank(b))
+  );
+
+  return m;
+}
+
+
+function pc(a,b){
+
+  return b&&num(b)!==0
+    ?(num(a)-num(b))/num(b)*100
+    :null;
+}
+
+
+function pt(v){
+
+  return v===null
+    ?"-"
+    :(v>0?"+":"")+v.toFixed(2)+"%";
+}
+
+
+function cls(v){
+
+  return "pill "+
+    (
+      v===null
+        ?""
+        :v>0
+          ?"up"
+          :v<0
+            ?"down"
+            :""
+    );
+}
+
+
+function latest(){
+
+  let o=[];
+
+  maps().forEach(a=>
+    o.push(a[a.length-1])
+  );
+
+  return o;
+}
+
+
+function filters(){
+
+  let ys=[
+    ...new Set(
+      rows.map(x=>x.year).filter(Boolean)
+    )
+  ].sort((a,b)=>b-a);
+
+  let ps=[
+    ...new Set(
+      rows.map(x=>x.period).filter(Boolean)
+    )
+  ];
+
+  yf.innerHTML=
+    '<option value="latest">최신 기준</option>'+
+    '<option value="all">전체 연도</option>'+
+    ys.map(y=>`<option>${y}</option>`).join("");
+
+  pf.innerHTML=
+    '<option value="all">전체 적용기간</option>'+
+    ps.map(p=>`<option>${p}</option>`).join("");
+}
+
+
+/* =====================================================
+   비교
+===================================================== */
+
 function comparison(x,m){
- let a=m.get(key(x))||[],i=a.findIndex(z=>z.id===x.id),prev=i>0?a[i-1]:null;
 
- if(x.category==="labor"){
-   let yoy=a.find(z=>num(z.year)===num(x.year)-1&&z.period===x.period);
-   return`<div class="compare"><span class="${cls(pc(x.value,prev?.value))}">직전 반기 ${pt(pc(x.value,prev?.value))}</span><span class="${cls(pc(x.value,yoy?.value))}">전년 동기 ${pt(pc(x.value,yoy?.value))}</span></div>`;
- }
+  let a=m.get(key(x))||[];
 
- if(x.category==="price_index"){
-   const d=x.effective_date?new Date(x.effective_date):null;
-   let yoy=null;
-   if(d){
-     yoy=a.find(z=>{
-       if(!z.effective_date)return false;
-       const zd=new Date(z.effective_date);
-       return zd.getFullYear()===d.getFullYear()-1 && zd.getMonth()===d.getMonth();
-     });
-   }
-   return`<div class="compare"><span class="${cls(pc(x.value,prev?.value))}">전월 대비 ${pt(pc(x.value,prev?.value))}</span><span class="${cls(pc(x.value,yoy?.value))}">전년 동월 ${pt(pc(x.value,yoy?.value))}</span></div>`;
- }
+  let i=a.findIndex(z=>z.id===x.id);
 
- let prior=[...a].reverse().find(z=>num(z.year)===num(x.year)-1);
- return`<div class="compare"><span class="${cls(pc(x.value,prior?.value))}">전년 대비 ${pt(pc(x.value,prior?.value))}</span></div>`;
+  let prev=i>0?a[i-1]:null;
+
+
+  if(x.category==="labor"){
+
+    let yoy=a.find(z=>
+      num(z.year)===num(x.year)-1 &&
+      z.period===x.period
+    );
+
+    return`
+      <div class="compare">
+        <span class="${cls(pc(x.value,prev?.value))}">
+          직전 반기 ${pt(pc(x.value,prev?.value))}
+        </span>
+
+        <span class="${cls(pc(x.value,yoy?.value))}">
+          전년 동기 ${pt(pc(x.value,yoy?.value))}
+        </span>
+      </div>
+    `;
+  }
+
+
+  if(x.category==="price_index"){
+
+    const d=x.effective_date
+      ?new Date(x.effective_date)
+      :null;
+
+    let yoy=null;
+
+    if(d){
+
+      yoy=a.find(z=>{
+
+        if(!z.effective_date)
+          return false;
+
+        const zd=new Date(z.effective_date);
+
+        return(
+          zd.getFullYear()===d.getFullYear()-1 &&
+          zd.getMonth()===d.getMonth()
+        );
+
+      });
+
+    }
+
+    return`
+      <div class="compare">
+
+        <span class="${cls(pc(x.value,prev?.value))}">
+          전월 대비 ${pt(pc(x.value,prev?.value))}
+        </span>
+
+        <span class="${cls(pc(x.value,yoy?.value))}">
+          전년 동월 ${pt(pc(x.value,yoy?.value))}
+        </span>
+
+      </div>
+    `;
+  }
+
+
+  let prior=[...a]
+    .reverse()
+    .find(z=>
+      num(z.year)===num(x.year)-1
+    );
+
+  return`
+    <div class="compare">
+      <span class="${cls(pc(x.value,prior?.value))}">
+        전년 대비 ${pt(pc(x.value,prior?.value))}
+      </span>
+    </div>
+  `;
 }
+
+
+/* =====================================================
+   이력
+===================================================== */
+
 function history(x,m){
- let all=(m.get(key(x))||[]);
- let limit=x.category==="labor"?5:x.category==="price_index"?12:3;
- let a=all.slice(-limit).reverse();
- if(a.length<2)return"";
- let mx=Math.max(...a.map(z=>num(z.value)||0));
 
- function label(z){
-   if(z.category==="price_index" && z.effective_date){
-     const d=new Date(z.effective_date);
-     return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}`;
-   }
-   return `${z.year}${z.period==="상반기"?" 상":z.period==="하반기"?" 하":""}`;
- }
+  let all=m.get(key(x))||[];
 
- const title=x.category==="labor"?"최근 5개 시점":
-             x.category==="price_index"?"최근 12개월":
-             "최근 3개년";
+  let limit=
+    x.category==="labor"
+      ?5
+      :x.category==="price_index"
+        ?12
+        :3;
 
- return`<div class="history"><div class="historyTitle">${title} 추이</div>${a.map((z,i)=>`<div class="hist ${i===0?"latestHist":""}"><span>${label(z)}${i===0?' <em class="latestBadge">N</em>':""}</span><div class="bar"><div class="fill ${i===0?"latestFill":""}" style="width:${mx?Math.max(8,num(z.value)/mx*100):0}%"></div></div><b>${fmt(z.value)}</b></div>`).join("")}</div>`
+  let a=all.slice(-limit).reverse();
+
+  if(a.length<2)
+    return"";
+
+  let mx=Math.max(
+    ...a.map(z=>num(z.value)||0)
+  );
+
+
+  function label(z){
+
+    if(
+      z.category==="price_index" &&
+      z.effective_date
+    ){
+
+      const d=new Date(z.effective_date);
+
+      return(
+        `${d.getFullYear()}.`+
+        `${String(d.getMonth()+1).padStart(2,"0")}`
+      );
+    }
+
+    return(
+      `${z.year}`+
+      `${z.period==="상반기"
+        ?" 상"
+        :z.period==="하반기"
+          ?" 하"
+          :""
+      }`
+    );
+  }
+
+
+  const title=
+    x.category==="labor"
+      ?"최근 5개 시점"
+      :x.category==="price_index"
+        ?"최근 12개월"
+        :"최근 3개년";
+
+
+  return`
+    <div class="history">
+
+      <div class="historyTitle">
+        ${title} 추이
+      </div>
+
+      ${a.map((z,i)=>`
+
+        <div class="hist ${i===0?"latestHist":""}">
+
+          <span>
+            ${label(z)}
+            ${i===0
+              ?'<em class="latestBadge">N</em>'
+              :""
+            }
+          </span>
+
+          <div class="bar">
+            <div
+              class="fill ${i===0?"latestFill":""}"
+              style="width:${
+                mx
+                  ?Math.max(8,num(z.value)/mx*100)
+                  :0
+              }%"
+            ></div>
+          </div>
+
+          <b>${fmt(z.value)}</b>
+
+        </div>
+
+      `).join("")}
+
+    </div>
+  `;
 }
+
+
+/* =====================================================
+   간접노무비
+===================================================== */
+
 function indirectLaborTable(data){
 
   const a=data
-    .filter(x =>
+    .filter(x=>
       x.category==="pps" &&
       x.name==="간접노무비" &&
       x.construction_type==="산업설비"
@@ -179,511 +886,1814 @@ function indirectLaborTable(data){
       num(x.period_min_days)-num(y.period_min_days)
     );
 
-  if(!a.length)return"";
+
+  if(!a.length)
+    return"";
+
 
   const amountBands=[
-    {label:"10억 미만",min:0,max:1000000000},
-    {label:"10~50억 미만",min:1000000000,max:5000000000},
-    {label:"50~300억 미만",min:5000000000,max:30000000000}
+
+    {
+      label:"10억 미만",
+      min:0,
+      max:1000000000
+    },
+
+    {
+      label:"10~50억 미만",
+      min:1000000000,
+      max:5000000000
+    },
+
+    {
+      label:"50~300억 미만",
+      min:5000000000,
+      max:30000000000
+    }
+
   ];
+
 
   const periods=[
-    {label:"6개월 이하",min:0,max:183},
-    {label:"7~12개월",min:184,max:365},
-    {label:"13~36개월",min:366,max:1095},
-    {label:"36개월 초과",min:1096,max:null}
+
+    {
+      label:"6개월 이하",
+      min:0,
+      max:183
+    },
+
+    {
+      label:"7~12개월",
+      min:184,
+      max:365
+    },
+
+    {
+      label:"13~36개월",
+      min:366,
+      max:1095
+    },
+
+    {
+      label:"36개월 초과",
+      min:1096,
+      max:null
+    }
+
   ];
 
+
   function getRate(b,p){
-    const r=a.find(x =>
+
+    const r=a.find(x=>
+
       num(x.amount_min)===b.min &&
+
       num(x.amount_max)===b.max &&
+
       num(x.period_min_days)===p.min &&
+
       (
         p.max===null
-          ? x.period_max_days===null
-          : num(x.period_max_days)===p.max
+          ?x.period_max_days===null
+          :num(x.period_max_days)===p.max
       )
+
     );
-    return r ? `${fmt(r.value)}%` : "-";
+
+    return r
+      ?`${fmt(r.value)}%`
+      :"-";
   }
+
 
   const latest=a[0];
 
-  return `
-    <article class="rateTableCard">
-      <div class="cat">조달청 분석요율</div>
-      <div class="rateTableTitle">간접노무비</div>
-      <div class="rateTableSub">산업설비 · 직접공사비 / 공사기간별 적용요율</div>
 
-      <div class="rateTableWrap">
-        <table class="rateTable">
-          <thead>
-            <tr>
-              <th>직접공사비</th>
-              ${periods.map(p=>`<th>${p.label}</th>`).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${amountBands.map(b=>`
-              <tr>
-                <td>${b.label}</td>
-                ${periods.map(p=>`<td>${getRate(b,p)}</td>`).join("")}
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
+  return`
+
+    <article class="rateTableCard">
+
+      <div class="cat">
+        조달청 분석요율
       </div>
 
+      <div class="rateTableTitle">
+        간접노무비
+      </div>
+
+      <div class="rateTableSub">
+        산업설비 · 직접공사비 / 공사기간별 적용요율
+      </div>
+
+
+      <div class="rateTableWrap">
+
+        <table class="rateTable">
+
+          <thead>
+
+            <tr>
+
+              <th>직접공사비</th>
+
+              ${periods.map(p=>
+                `<th>${p.label}</th>`
+              ).join("")}
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${amountBands.map(b=>`
+
+              <tr>
+
+                <td>${b.label}</td>
+
+                ${periods.map(p=>
+                  `<td>${getRate(b,p)}</td>`
+                ).join("")}
+
+              </tr>
+
+            `).join("")}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
       <div class="rateTableMeta">
+
         적용기준: 직접노무비 × 해당 요율<br>
         적용일: ${latest?.effective_date||"-"}<br>
         출처: ${latest?.source||"조달청"}
+
       </div>
+
     </article>
   `;
 }
+
+
+/* =====================================================
+   산업안전보건관리비
+===================================================== */
 
 function safetyHealthTable(data){
 
   const a=data
-    .filter(x =>
+    .filter(x=>
+
       x.category==="pps" &&
+
       x.name==="산업안전보건관리비" &&
-      ["건축공사","토목공사","특수건설공사"].includes(x.construction_type)
+
+      [
+        "건축공사",
+        "토목공사",
+        "특수건설공사"
+      ].includes(x.construction_type)
+
     )
     .sort((x,y)=>
-      (x.construction_type||"").localeCompare(y.construction_type||"","ko") ||
-      num(x.amount_min)-num(y.amount_min) ||
+
+      (x.construction_type||"")
+        .localeCompare(
+          y.construction_type||"",
+          "ko"
+        )
+
+      ||
+
+      num(x.amount_min)-num(y.amount_min)
+
+      ||
+
       num(x.rate)-num(y.rate)
+
     );
 
-  if(!a.length)return"";
 
-  const types=["건축공사","토목공사","특수건설공사"];
+  if(!a.length)
+    return"";
+
+
+  const types=[
+    "건축공사",
+    "토목공사",
+    "특수건설공사"
+  ];
+
 
   function rowsFor(type){
-    return a.filter(x=>x.construction_type===type);
-  }
 
-  function band(type,min,max){
-    return rowsFor(type).find(x =>
-      num(x.amount_min)===min &&
-      (
-        max===null
-          ? x.amount_max===null
-          : num(x.amount_max)===max
-      )
+    return a.filter(x=>
+      x.construction_type===type
     );
   }
 
+
+  function band(type,min,max){
+
+    return rowsFor(type).find(x=>
+
+      num(x.amount_min)===min &&
+
+      (
+        max===null
+          ?x.amount_max===null
+          :num(x.amount_max)===max
+      )
+
+    );
+  }
+
+
   function rateText(r){
-    if(!r)return"-";
+
+    if(!r)
+      return"-";
+
     const base=num(r.base_amount);
+
     if(base>0){
-      return `${fmt(r.value)}% <span class="rateExtra">+ ${fmt(base/10000)}만원</span>`;
+
+      return(
+        `${fmt(r.value)}% `+
+        `<span class="rateExtra">`+
+        `+ ${fmt(base/10000)}만원`+
+        `</span>`
+      );
     }
+
     return `${fmt(r.value)}%`;
   }
 
-  function over50(type){
-    const rs=rowsFor(type)
-      .filter(x=>num(x.amount_min)===5000000000)
-      .sort((x,y)=>num(x.rate)-num(y.rate));
 
-    if(!rs.length)return"-";
+  function over50(type){
+
+    const rs=rowsFor(type)
+      .filter(x=>
+        num(x.amount_min)===5000000000
+      )
+      .sort((x,y)=>
+        num(x.rate)-num(y.rate)
+      );
+
+
+    if(!rs.length)
+      return"-";
+
 
     return rs.map(r=>{
+
       let label="";
+
+
       if(type==="토목공사"){
-        label=(r.note||"").includes("1,000억원 이상")
-          ?"추정금액 1,000억 이상"
-          :"추정금액 1,000억 미만";
+
+        label=(r.note||"")
+          .includes("1,000억원 이상")
+            ?"추정금액 1,000억 이상"
+            :"추정금액 1,000억 미만";
+
       }else{
-        label=(r.note||"").includes("800억원 이상")
-          ?"추정금액 800억 이상"
-          :"추정금액 800억 미만";
+
+        label=(r.note||"")
+          .includes("800억원 이상")
+            ?"추정금액 800억 이상"
+            :"추정금액 800억 미만";
+
       }
-      return `<div class="rateSplit"><span>${label}</span><strong>${fmt(r.value)}%</strong></div>`;
+
+
+      return`
+
+        <div class="rateSplit">
+
+          <span>${label}</span>
+
+          <strong>
+            ${fmt(r.value)}%
+          </strong>
+
+        </div>
+      `;
+
     }).join("");
   }
 
+
   const latest=a[0];
 
-  return `
+
+  return`
+
     <article class="rateTableCard">
-      <div class="cat">법정경비</div>
-      <div class="rateTableTitle">산업안전보건관리비</div>
-      <div class="rateTableSub">공종 · 대상액 구간별 적용요율</div>
+
+      <div class="cat">
+        법정경비
+      </div>
+
+      <div class="rateTableTitle">
+        산업안전보건관리비
+      </div>
+
+      <div class="rateTableSub">
+        공종 · 대상액 구간별 적용요율
+      </div>
+
 
       <div class="rateTableWrap">
+
         <table class="rateTable safetyTable">
+
           <thead>
+
             <tr>
+
               <th>공종</th>
               <th>5억 미만</th>
               <th>5~50억 미만</th>
               <th>50억 이상</th>
+
             </tr>
+
           </thead>
+
+
           <tbody>
+
             ${types.map(type=>`
+
               <tr>
+
                 <td>${type}</td>
-                <td>${rateText(band(type,0,500000000))}</td>
-                <td>${rateText(band(type,500000000,5000000000))}</td>
-                <td class="rateMulti">${over50(type)}</td>
+
+                <td>
+                  ${rateText(
+                    band(
+                      type,
+                      0,
+                      500000000
+                    )
+                  )}
+                </td>
+
+                <td>
+                  ${rateText(
+                    band(
+                      type,
+                      500000000,
+                      5000000000
+                    )
+                  )}
+                </td>
+
+                <td class="rateMulti">
+                  ${over50(type)}
+                </td>
+
               </tr>
+
             `).join("")}
+
           </tbody>
+
         </table>
+
       </div>
 
+
       <div class="rateTableMeta">
+
         적용대상: 총공사금액 2천만원 이상 건설공사<br>
         대상액: 재료비 + 직접노무비 + 도급자설치 관급금액<br>
         적용일: ${latest?.effective_date||"-"}<br>
         출처: ${latest?.source||"조달청"}
+
       </div>
+
     </article>
   `;
 }
 
+
+/* =====================================================
+   일반관리비
+===================================================== */
+
 function generalAdminTable(data){
-  const a=data
-    .filter(x =>
-      x.category==="pps" &&
-      x.name==="일반관리비" &&
-      ["토목","조경","산업설비","전문","전기","소방"].includes(x.construction_type)
-    );
 
-  if(!a.length)return"";
+  const a=data.filter(x=>
 
-  const types=["토목","조경","산업설비","전문","전기","소방"];
-  const bands=[
-    {label:"5억 미만",min:0,max:500000000},
-    {label:"5~30억 미만",min:500000000,max:3000000000},
-    {label:"30~50억 미만",min:3000000000,max:5000000000},
-    {label:"50~100억 미만",min:5000000000,max:10000000000},
-    {label:"100~300억 미만",min:10000000000,max:30000000000}
+    x.category==="pps" &&
+
+    x.name==="일반관리비" &&
+
+    [
+      "토목",
+      "조경",
+      "산업설비",
+      "전문",
+      "전기",
+      "소방"
+    ].includes(x.construction_type)
+
+  );
+
+
+  if(!a.length)
+    return"";
+
+
+  const types=[
+    "토목",
+    "조경",
+    "산업설비",
+    "전문",
+    "전기",
+    "소방"
   ];
 
+
+  const bands=[
+
+    {
+      label:"5억 미만",
+      min:0,
+      max:500000000
+    },
+
+    {
+      label:"5~30억 미만",
+      min:500000000,
+      max:3000000000
+    },
+
+    {
+      label:"30~50억 미만",
+      min:3000000000,
+      max:5000000000
+    },
+
+    {
+      label:"50~100억 미만",
+      min:5000000000,
+      max:10000000000
+    },
+
+    {
+      label:"100~300억 미만",
+      min:10000000000,
+      max:30000000000
+    }
+
+  ];
+
+
   function getRate(type,b){
-    const r=a.find(x =>
+
+    const r=a.find(x=>
+
       x.construction_type===type &&
+
       num(x.amount_min)===b.min &&
+
       num(x.amount_max)===b.max
+
     );
-    return r ? `${fmt(r.value)}%` : "-";
+
+
+    return r
+      ?`${fmt(r.value)}%`
+      :"-";
   }
+
 
   const latest=a[0];
 
-  return `
-    <article class="rateTableCard">
-      <div class="cat">조달청 분석요율</div>
-      <div class="rateTableTitle">일반관리비</div>
-      <div class="rateTableSub">공종 · 추정가격별 적용요율 (300억 미만)</div>
 
-      <div class="rateTableWrap">
-        <table class="rateTable">
-          <thead>
-            <tr>
-              <th>공종</th>
-              ${bands.map(b=>`<th>${b.label}</th>`).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${types.map(type=>`
-              <tr>
-                <td>${type}</td>
-                ${bands.map(b=>`<td>${getRate(type,b)}</td>`).join("")}
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
+  return`
+
+    <article class="rateTableCard">
+
+      <div class="cat">
+        조달청 분석요율
       </div>
 
+      <div class="rateTableTitle">
+        일반관리비
+      </div>
+
+      <div class="rateTableSub">
+        공종 · 추정가격별 적용요율 (300억 미만)
+      </div>
+
+
+      <div class="rateTableWrap">
+
+        <table class="rateTable">
+
+          <thead>
+
+            <tr>
+
+              <th>공종</th>
+
+              ${bands.map(b=>
+                `<th>${b.label}</th>`
+              ).join("")}
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${types.map(type=>`
+
+              <tr>
+
+                <td>${type}</td>
+
+                ${bands.map(b=>
+                  `<td>${getRate(type,b)}</td>`
+                ).join("")}
+
+              </tr>
+
+            `).join("")}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
       <div class="rateTableMeta">
+
         적용기준: (재료비 + 노무비 + 경비) × 해당 요율<br>
         기준금액: 추정가격<br>
         적용일: ${latest?.effective_date||"-"}<br>
         출처: ${latest?.source||"조달청"}
+
       </div>
+
     </article>
   `;
 }
 
-function profitTable(data){
-  const a=data
-    .filter(x => x.category==="pps" && x.name==="이윤")
-    .sort((x,y)=>num(x.amount_min)-num(y.amount_min));
 
-  if(!a.length)return"";
+/* =====================================================
+   이윤
+===================================================== */
+
+function profitTable(data){
+
+  const a=data
+    .filter(x=>
+      x.category==="pps" &&
+      x.name==="이윤"
+    )
+    .sort((x,y)=>
+      num(x.amount_min)-num(y.amount_min)
+    );
+
+
+  if(!a.length)
+    return"";
+
 
   const bands=[
-    {label:"50억 미만",min:0,max:5000000000},
-    {label:"50~300억 미만",min:5000000000,max:30000000000}
+
+    {
+      label:"50억 미만",
+      min:0,
+      max:5000000000
+    },
+
+    {
+      label:"50~300억 미만",
+      min:5000000000,
+      max:30000000000
+    }
+
   ];
 
+
   function getRate(b){
+
     const r=a.find(x=>
+
       num(x.amount_min)===b.min &&
+
       num(x.amount_max)===b.max
+
     );
-    return r ? `${fmt(r.value)}%` : "-";
+
+    return r
+      ?`${fmt(r.value)}%`
+      :"-";
   }
+
 
   const latest=a[0];
 
-  return `
-    <article class="rateTableCard">
-      <div class="cat">조달청 분석요율</div>
-      <div class="rateTableTitle">이윤</div>
-      <div class="rateTableSub">추정가격별 적용요율 (300억 미만)</div>
 
-      <div class="rateTableWrap">
-        <table class="rateTable">
-          <thead>
-            <tr>
-              ${bands.map(b=>`<th>${b.label}</th>`).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              ${bands.map(b=>`<td>${getRate(b)}</td>`).join("")}
-            </tr>
-          </tbody>
-        </table>
+  return`
+
+    <article class="rateTableCard">
+
+      <div class="cat">
+        조달청 분석요율
       </div>
 
+      <div class="rateTableTitle">
+        이윤
+      </div>
+
+      <div class="rateTableSub">
+        추정가격별 적용요율 (300억 미만)
+      </div>
+
+
+      <div class="rateTableWrap">
+
+        <table class="rateTable">
+
+          <thead>
+
+            <tr>
+
+              ${bands.map(b=>
+                `<th>${b.label}</th>`
+              ).join("")}
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            <tr>
+
+              ${bands.map(b=>
+                `<td>${getRate(b)}</td>`
+              ).join("")}
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
       <div class="rateTableMeta">
+
         적용기준: (노무비 + 경비 + 일반관리비) × 해당 요율<br>
         기준금액: 추정가격<br>
         적용일: ${latest?.effective_date||"-"}<br>
         출처: ${latest?.source||"조달청"}
+
       </div>
+
     </article>
   `;
 }
 
+
+/* =====================================================
+   엔지니어링 노임단가
+===================================================== */
+
+function engineeringTable(data){
+
+  let a=data.filter(x=>
+    x.category==="engineering"
+  );
+
+
+  if(!a.length)
+    return"";
+
+
+  /*
+    연도 필터 적용
+  */
+
+  if(
+    yf.value!=="latest" &&
+    yf.value!=="all"
+  ){
+
+    a=a.filter(x=>
+      String(x.year)===yf.value
+    );
+
+  }else if(yf.value==="latest"){
+
+    const years=a
+      .map(x=>num(x.year))
+      .filter(Number.isFinite);
+
+    if(years.length){
+
+      const maxYear=Math.max(...years);
+
+      a=a.filter(x=>
+        num(x.year)===maxYear
+      );
+    }
+  }
+
+
+  if(!a.length)
+    return"";
+
+
+  /*
+    같은 공종/등급 데이터가 여러 개면
+    적용일이 가장 최신인 것 사용
+  */
+
+  const latestMap=new Map();
+
+  a.forEach(x=>{
+
+    const k=
+      `${x.subcategory||""}|${x.grade||""}`;
+
+    const old=latestMap.get(k);
+
+    if(
+      !old ||
+      rank(x)>rank(old)
+    ){
+
+      latestMap.set(k,x);
+
+    }
+
+  });
+
+
+  a=[...latestMap.values()];
+
+
+  const types=[
+    "기계·설비",
+    "전기",
+    "정보통신",
+    "건설",
+    "환경",
+    "원자력",
+    "기타"
+  ];
+
+
+  const grades=[
+    "기술사",
+    "특급기술자",
+    "고급기술자",
+    "중급기술자",
+    "초급기술자",
+    "고급숙련기술자",
+    "중급숙련기술자",
+    "초급숙련기술자"
+  ];
+
+
+  function findRate(type,grade){
+
+    return a.find(x=>
+
+      x.subcategory===type &&
+
+      (
+        x.grade===grade ||
+        x.name===grade
+      )
+
+    );
+
+  }
+
+
+  /*
+    DB 구조가
+    name=기술자 / grade=특급
+    형태일 경우도 대응
+  */
+
+  function findFlexible(type,grade){
+
+    let r=findRate(type,grade);
+
+    if(r)
+      return r;
+
+
+    const gradeMap={
+
+      "기술사":["기술사"],
+
+      "특급기술자":[
+        "특급",
+        "특급기술자"
+      ],
+
+      "고급기술자":[
+        "고급",
+        "고급기술자"
+      ],
+
+      "중급기술자":[
+        "중급",
+        "중급기술자"
+      ],
+
+      "초급기술자":[
+        "초급",
+        "초급기술자"
+      ],
+
+      "고급숙련기술자":[
+        "고급숙련",
+        "고급숙련기술자"
+      ],
+
+      "중급숙련기술자":[
+        "중급숙련",
+        "중급숙련기술자"
+      ],
+
+      "초급숙련기술자":[
+        "초급숙련",
+        "초급숙련기술자"
+      ]
+
+    };
+
+
+    const names=gradeMap[grade]||[grade];
+
+
+    return a.find(x=>
+
+      x.subcategory===type &&
+
+      (
+        names.includes(x.grade) ||
+        names.includes(x.name)
+      )
+
+    );
+
+  }
+
+
+  const sample=a
+    .slice()
+    .sort((x,y)=>
+      rank(y)-rank(x)
+    )[0];
+
+
+  /*
+    전체보기
+  */
+
+  if(engineeringType==="전체보기"){
+
+    return`
+
+      <article class="rateTableCard">
+
+        <div class="cat">
+          엔지니어링 노임
+        </div>
+
+        <div class="rateTableTitle">
+          엔지니어링 기술자 노임단가
+        </div>
+
+        <div class="rateTableSub">
+          기술등급 · 기술부문별 평균임금
+        </div>
+
+
+        ${engineeringTabs()}
+
+
+        <div class="rateTableWrap">
+
+          <table class="rateTable engAllTable">
+
+            <thead>
+
+              <tr>
+
+                <th>기술등급</th>
+
+                ${types.map(type=>
+                  `<th>${type}</th>`
+                ).join("")}
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              ${grades.map(grade=>`
+
+                <tr>
+
+                  <td>${grade}</td>
+
+                  ${types.map(type=>{
+
+                    const r=
+                      findFlexible(
+                        type,
+                        grade
+                      );
+
+                    return`
+                      <td>
+                        ${
+                          r
+                            ?fmt(r.value)
+                            :"-"
+                        }
+                      </td>
+                    `;
+
+                  }).join("")}
+
+                </tr>
+
+              `).join("")}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <div class="rateTableMeta">
+
+          ${
+            sample?.year
+              ?`${sample.year}년 적용`
+              :""
+          }
+
+          · 1인 1일 기준
+
+          · 월평균 근무일수 20.3일<br>
+
+          적용일:
+          ${sample?.effective_date||"2026-01-01"}<br>
+
+          출처:
+          ${sample?.source||"한국엔지니어링협회"}
+
+        </div>
+
+      </article>
+    `;
+  }
+
+
+  /*
+    공종별 보기
+  */
+
+  const selectedRows=
+    grades.map(grade=>({
+
+      grade,
+
+      row:findFlexible(
+        engineeringType,
+        grade
+      )
+
+    }));
+
+
+  return`
+
+    <article class="rateTableCard">
+
+      <div class="cat">
+        엔지니어링 노임
+      </div>
+
+      <div class="rateTableTitle">
+        엔지니어링 기술자 노임단가
+      </div>
+
+      <div class="rateTableSub">
+        ${engineeringType} · 기술등급별 평균임금
+      </div>
+
+
+      ${engineeringTabs()}
+
+
+      <div class="rateTableWrap">
+
+        <table class="rateTable engSimpleTable">
+
+          <thead>
+
+            <tr>
+
+              <th>기술등급</th>
+
+              <th>
+                ${sample?.year||2026}
+                노임단가
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${selectedRows.map(item=>`
+
+              <tr>
+
+                <td>
+                  ${item.grade}
+                </td>
+
+                <td>
+
+                  ${
+                    item.row
+                      ?`
+                        <span class="engValue">
+                          ${fmt(item.row.value)}
+                        </span>
+
+                        <span class="engUnit">
+                          원
+                        </span>
+                      `
+                      :"-"
+                  }
+
+                </td>
+
+              </tr>
+
+            `).join("")}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div class="rateTableMeta">
+
+        ${
+          sample?.year
+            ?`${sample.year}년 적용`
+            :""
+        }
+
+        · 1인 1일 기준
+
+        · 월평균 근무일수 20.3일<br>
+
+        적용일:
+        ${sample?.effective_date||"2026-01-01"}<br>
+
+        출처:
+        ${sample?.source||"한국엔지니어링협회"}
+
+      </div>
+
+    </article>
+  `;
+}
+
+
+function engineeringTabs(){
+
+  const types=[
+    "기계·설비",
+    "전기",
+    "정보통신",
+    "건설",
+    "환경",
+    "원자력",
+    "기타",
+    "전체보기"
+  ];
+
+
+  return`
+
+    <div class="engTabs">
+
+      ${types.map(type=>`
+
+        <button
+          type="button"
+          class="engTab ${
+            engineeringType===type
+              ?"on"
+              :""
+          }"
+          onclick="setEngineeringType('${type}')"
+        >
+
+          ${type}
+
+        </button>
+
+      `).join("")}
+
+    </div>
+  `;
+}
+
+
+function setEngineeringType(type){
+
+  engineeringType=type;
+
+  render();
+}
+
+
+/* =====================================================
+   메인 렌더
+===================================================== */
+
 function render(){
 
-  let m=maps(),
-      terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),
-      base=yf.value==="latest"?latest():rows.slice();
+  let m=maps();
+
+  let terms=q.value
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+
+  let base=
+    yf.value==="latest"
+      ?latest()
+      :rows.slice();
+
 
   let a=base.filter(x=>{
 
-    if(cat!=="all"&&x.category!==cat)return false;
+    if(
+      cat!=="all" &&
+      x.category!==cat
+    )
+      return false;
+
 
     if(
       yf.value!=="latest" &&
       yf.value!=="all" &&
       String(x.year)!==yf.value
-    )return false;
+    )
+      return false;
 
-    if(pf.value!=="all"&&x.period!==pf.value)return false;
+
+    if(
+      pf.value!=="all" &&
+      x.period!==pf.value
+    )
+      return false;
+
 
     let h=[
+
       x.name,
       x.grade,
       x.subcategory,
       x.category_label,
       x.source,
       x.note,
-      ...(Array.isArray(x.keywords)?x.keywords:[])
+
+      ...(Array.isArray(x.keywords)
+        ?x.keywords
+        :[])
+
     ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
-    return terms.every(t=>h.includes(t));
 
-  }).sort((a,b)=>
-    (a.name||"").localeCompare(b.name||"","ko")
+    return terms.every(t=>
+      h.includes(t)
+    );
+
+  })
+  .sort((a,b)=>
+
+    (a.name||"")
+      .localeCompare(
+        b.name||"",
+        "ko"
+      )
+
   );
+
+
+  /*
+    표로 별도 출력할 데이터는
+    일반 카드에서 제외
+  */
 
   const normalRows=a.filter(x=>
+
     !(
-      x.category==="pps" &&
+
+      x.category==="engineering"
+
+      ||
+
       (
-        (x.name==="간접노무비" && x.construction_type==="산업설비") ||
-        (x.name==="산업안전보건관리비" &&
-          ["건축공사","토목공사","특수건설공사"].includes(x.construction_type)) ||
-        (x.name==="일반관리비" &&
-          ["토목","조경","산업설비","전문","전기","소방"].includes(x.construction_type)) ||
-        x.name==="이윤"
+
+        x.category==="pps" &&
+
+        (
+
+          (
+            x.name==="간접노무비" &&
+            x.construction_type==="산업설비"
+          )
+
+          ||
+
+          (
+            x.name==="산업안전보건관리비" &&
+
+            [
+              "건축공사",
+              "토목공사",
+              "특수건설공사"
+            ].includes(x.construction_type)
+          )
+
+          ||
+
+          (
+            x.name==="일반관리비" &&
+
+            [
+              "토목",
+              "조경",
+              "산업설비",
+              "전문",
+              "전기",
+              "소방"
+            ].includes(x.construction_type)
+          )
+
+          ||
+
+          x.name==="이윤"
+
+        )
+
       )
+
     )
+
   );
 
-  const showSpecial=cat==="pps" || cat==="all";
-  const query=q.value.toLowerCase().trim();
+
+  const query=q.value
+    .toLowerCase()
+    .trim();
+
+
+  const showSpecial=
+    cat==="pps" ||
+    cat==="all";
+
 
   const showIndirect=
+
     showSpecial &&
+
     (
+
       !query ||
-      ["간접노무비","산업설비","직접공사비","공사기간","조달청"].some(t=>t.includes(query)||query.includes(t))
+
+      [
+        "간접노무비",
+        "산업설비",
+        "직접공사비",
+        "공사기간",
+        "조달청"
+      ].some(t=>
+        t.includes(query) ||
+        query.includes(t)
+      )
+
     );
+
 
   const showSafety=
+
     showSpecial &&
+
     (
+
       !query ||
-      ["산업안전보건관리비","산안비","건축공사","토목공사","특수건설공사","조달청"].some(t=>t.includes(query)||query.includes(t))
+
+      [
+        "산업안전보건관리비",
+        "산안비",
+        "건축공사",
+        "토목공사",
+        "특수건설공사",
+        "조달청"
+      ].some(t=>
+        t.includes(query) ||
+        query.includes(t)
+      )
+
     );
+
 
   const showGeneralAdmin=
+
     showSpecial &&
+
     (
+
       !query ||
-      ["일반관리비","토목","조경","산업설비","전문","전기","소방","조달청"].some(t=>t.includes(query)||query.includes(t))
+
+      [
+        "일반관리비",
+        "토목",
+        "조경",
+        "산업설비",
+        "전문",
+        "전기",
+        "소방",
+        "조달청"
+      ].some(t=>
+        t.includes(query) ||
+        query.includes(t)
+      )
+
     );
 
+
   const showProfit=
+
     showSpecial &&
+
     (
+
       !query ||
-      ["이윤","조달청","추정가격"].some(t=>t.includes(query)||query.includes(t))
+
+      [
+        "이윤",
+        "조달청",
+        "추정가격"
+      ].some(t=>
+        t.includes(query) ||
+        query.includes(t)
+      )
+
     );
+
+
+  /*
+    엔지니어링 표 표시조건
+  */
+
+  const showEngineering=
+
+    (
+      cat==="engineering" ||
+      cat==="all"
+    )
+
+    &&
+
+    (
+
+      !query ||
+
+      [
+        "엔지니어링",
+        "기술사",
+        "특급",
+        "고급",
+        "중급",
+        "초급",
+        "숙련",
+        "기계",
+        "설비",
+        "전기",
+        "정보통신",
+        "건설",
+        "환경",
+        "원자력"
+      ].some(t=>
+        t.includes(query) ||
+        query.includes(t)
+      )
+
+    );
+
 
   let html="";
 
-  if(showIndirect) html+=indirectLaborTable(rows);
-  if(showSafety) html+=safetyHealthTable(rows);
-  if(showGeneralAdmin) html+=generalAdminTable(rows);
-  if(showProfit) html+=profitTable(rows);
+
+  if(showIndirect)
+    html+=indirectLaborTable(rows);
+
+
+  if(showSafety)
+    html+=safetyHealthTable(rows);
+
+
+  if(showGeneralAdmin)
+    html+=generalAdminTable(rows);
+
+
+  if(showProfit)
+    html+=profitTable(rows);
+
+
+  if(showEngineering)
+    html+=engineeringTable(rows);
+
 
   html+=normalRows.map(x=>`
+
     <article class="card">
-      <div class="cat">${x.category_label||""}</div>
-      <div class="name">${x.name||""}${x.grade?" · "+x.grade:""}</div>
-      <div class="sub">${x.subcategory||""}</div>
+
+      <div class="cat">
+        ${x.category_label||""}
+      </div>
+
+      <div class="name">
+        ${x.name||""}
+        ${x.grade
+          ?" · "+x.grade
+          :""
+        }
+      </div>
+
+      <div class="sub">
+        ${x.subcategory||""}
+      </div>
+
       <div class="val">
+
         ${fmt(x.value)}
-        <span class="unit">${x.unit||""}</span>
+
+        <span class="unit">
+          ${x.unit||""}
+        </span>
+
       </div>
+
+
       ${comparison(x,m)}
+
       ${history(x,m)}
+
+
       <div class="meta">
-        기준: ${x.year||""}년 ${x.period||""}<br>
-        적용일: ${x.effective_date||"-"}<br>
-        출처: ${x.source||"-"}
+
+        기준:
+        ${x.year||""}년
+        ${x.period||""}
+        <br>
+
+        적용일:
+        ${x.effective_date||"-"}
+        <br>
+
+        출처:
+        ${x.source||"-"}
+
       </div>
+
     </article>
+
   `).join("");
 
-  status.textContent=`${a.length.toLocaleString()}개 기준값 조회됨`;
+
+  /*
+    조회건수
+  */
+
+  if(cat==="engineering"){
+
+    const engCount=
+      rows.filter(x=>
+        x.category==="engineering"
+      ).length;
+
+    status.textContent=
+      `${engCount.toLocaleString()}개 엔지니어링 기준값`;
+
+  }else{
+
+    status.textContent=
+      `${a.length.toLocaleString()}개 기준값 조회됨`;
+
+  }
+
 
   grid.innerHTML=
+
     html ||
+
     '<div class="empty">검색 결과가 없습니다.</div>';
 }
 
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(z=>z.classList.remove("on"));b.classList.add("on");cat=b.dataset.c;render()});q.oninput=render;yf.onchange=render;pf.onchange=render;
+
+/* =====================================================
+   이벤트
+===================================================== */
+
+document
+  .querySelectorAll(".tab")
+  .forEach(b=>{
+
+    b.onclick=()=>{
+
+      document
+        .querySelectorAll(".tab")
+        .forEach(z=>
+          z.classList.remove("on")
+        );
+
+      b.classList.add("on");
+
+      cat=b.dataset.c;
+
+      render();
+    };
+
+  });
+
+
+q.oninput=render;
+
+yf.onchange=render;
+
+pf.onchange=render;
+
+
+/* =====================================================
+   Supabase
+===================================================== */
+
 (async()=>{
+
   try{
-    if(!window.COST_DIARY_CONFIG) throw Error("config.js 연결정보 없음");
+
+    if(!window.COST_DIARY_CONFIG)
+      throw Error(
+        "config.js 연결정보 없음"
+      );
+
 
     const s=supabase.createClient(
+
       COST_DIARY_CONFIG.url,
+
       COST_DIARY_CONFIG.key
+
     );
 
-    // 기존 기준정보
+
+    /*
+      기존 기준정보
+    */
+
     const standardsRes=await s
+
       .from("standards")
+
       .select("*")
+
       .eq("is_active",true)
+
       .order("year")
+
       .order("effective_date");
 
-    if(standardsRes.error) throw standardsRes.error;
 
-    // 조달청 간접공사비/법정경비
+    if(standardsRes.error)
+      throw standardsRes.error;
+
+
+    /*
+      조달청 간접공사비 / 법정경비
+    */
+
     const ppsRes=await s
+
       .from("pps_rates")
+
       .select("*")
+
       .eq("is_active",true)
+
       .order("effective_date")
+
       .order("id");
 
-    if(ppsRes.error) throw ppsRes.error;
 
-    const ppsRows=(ppsRes.data||[]).map(x=>{
-      const d=x.effective_date ? new Date(x.effective_date) : null;
+    if(ppsRes.error)
+      throw ppsRes.error;
 
-      return {
-        id:"pps_"+x.id,
-        category:"pps",
-        category_label:x.expense_group||"법정경비",
 
-        name:x.expense_name,
+    const ppsRows=
+      (ppsRes.data||[])
+      .map(x=>{
 
-        subcategory:[
-          x.construction_type,
-          x.construction_subtype
-        ].filter(Boolean).join(" · "),
+        const d=
+          x.effective_date
+            ?new Date(x.effective_date)
+            :null;
 
-        grade:null,
-construction_type:x.construction_type,
-construction_subtype:x.construction_subtype,
-amount_min:x.amount_min,
-amount_max:x.amount_max,
-period_min_days:x.period_min_days,
-period_max_days:x.period_max_days,
-calculation_base:x.calculation_base,
-formula_text:x.formula_text,
-base_amount:x.base_amount,
-        value:x.rate,
-        unit:"%",
 
-        year:d ? d.getFullYear() : null,
-        period:d
-          ? `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}`
-          : "",
+        return{
 
-        effective_date:x.effective_date,
+          id:"pps_"+x.id,
 
-        source:x.source||"조달청",
+          category:"pps",
 
-        note:[
-          x.calculation_base
-            ? `적용기준: ${x.calculation_base}`
-            : "",
-          x.formula_text||"",
-          x.base_amount
-            ? `기초액: ${Number(x.base_amount).toLocaleString("ko-KR")}원`
-            : "",
-          x.note||""
-        ].filter(Boolean).join(" / "),
+          category_label:
+            x.expense_group||
+            "법정경비",
 
-        keywords:[
-          x.expense_name,
-          x.expense_group,
-          x.construction_type,
-          x.construction_subtype,
-          x.calculation_base
-        ].filter(Boolean),
+          name:x.expense_name,
 
-        is_active:true
-      };
-    });
+          subcategory:[
+
+            x.construction_type,
+
+            x.construction_subtype
+
+          ]
+          .filter(Boolean)
+          .join(" · "),
+
+          grade:null,
+
+          construction_type:
+            x.construction_type,
+
+          construction_subtype:
+            x.construction_subtype,
+
+          amount_min:
+            x.amount_min,
+
+          amount_max:
+            x.amount_max,
+
+          period_min_days:
+            x.period_min_days,
+
+          period_max_days:
+            x.period_max_days,
+
+          calculation_base:
+            x.calculation_base,
+
+          formula_text:
+            x.formula_text,
+
+          base_amount:
+            x.base_amount,
+
+          value:x.rate,
+
+          unit:"%",
+
+          year:d
+            ?d.getFullYear()
+            :null,
+
+          period:d
+            ?`${d.getFullYear()}.${String(
+                d.getMonth()+1
+              ).padStart(2,"0")}`
+            :"",
+
+          effective_date:
+            x.effective_date,
+
+          source:
+            x.source||
+            "조달청",
+
+          note:[
+
+            x.calculation_base
+              ?`적용기준: ${x.calculation_base}`
+              :"",
+
+            x.formula_text||"",
+
+            x.base_amount
+              ?`기초액: ${Number(
+                  x.base_amount
+                ).toLocaleString("ko-KR")}원`
+              :"",
+
+            x.note||""
+
+          ]
+          .filter(Boolean)
+          .join(" / "),
+
+          keywords:[
+
+            x.expense_name,
+
+            x.expense_group,
+
+            x.construction_type,
+
+            x.construction_subtype,
+
+            x.calculation_base
+
+          ]
+          .filter(Boolean),
+
+          is_active:true
+
+        };
+
+      });
+
 
     rows=[
+
       ...(standardsRes.data||[]),
+
       ...ppsRows
+
     ];
 
+
     filters();
+
     render();
 
+
   }catch(e){
-    status.textContent="데이터 연결 실패";
-    grid.innerHTML=`<div class="error">${e.message}</div>`;
+
+    status.textContent=
+      "데이터 연결 실패";
+
+    grid.innerHTML=
+      `<div class="error">${e.message}</div>`;
+
   }
+
 })();
+
 </script>
-</body></html>
+
+</body>
+</html>
