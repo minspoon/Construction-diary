@@ -349,6 +349,124 @@ function safetyHealthTable(data){
   `;
 }
 
+function generalAdminTable(data){
+  const a=data
+    .filter(x =>
+      x.category==="pps" &&
+      x.name==="일반관리비" &&
+      ["토목","조경","산업설비","전문","전기","소방"].includes(x.construction_type)
+    );
+
+  if(!a.length)return"";
+
+  const types=["토목","조경","산업설비","전문","전기","소방"];
+  const bands=[
+    {label:"5억 미만",min:0,max:500000000},
+    {label:"5~30억 미만",min:500000000,max:3000000000},
+    {label:"30~50억 미만",min:3000000000,max:5000000000},
+    {label:"50~100억 미만",min:5000000000,max:10000000000},
+    {label:"100~300억 미만",min:10000000000,max:30000000000}
+  ];
+
+  function getRate(type,b){
+    const r=a.find(x =>
+      x.construction_type===type &&
+      num(x.amount_min)===b.min &&
+      num(x.amount_max)===b.max
+    );
+    return r ? `${fmt(r.value)}%` : "-";
+  }
+
+  const latest=a[0];
+
+  return `
+    <article class="rateTableCard">
+      <div class="cat">조달청 분석요율</div>
+      <div class="rateTableTitle">일반관리비</div>
+      <div class="rateTableSub">공종 · 추정가격별 적용요율 (300억 미만)</div>
+
+      <div class="rateTableWrap">
+        <table class="rateTable">
+          <thead>
+            <tr>
+              <th>공종</th>
+              ${bands.map(b=>`<th>${b.label}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${types.map(type=>`
+              <tr>
+                <td>${type}</td>
+                ${bands.map(b=>`<td>${getRate(type,b)}</td>`).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rateTableMeta">
+        적용기준: (재료비 + 노무비 + 경비) × 해당 요율<br>
+        기준금액: 추정가격<br>
+        적용일: ${latest?.effective_date||"-"}<br>
+        출처: ${latest?.source||"조달청"}
+      </div>
+    </article>
+  `;
+}
+
+function profitTable(data){
+  const a=data
+    .filter(x => x.category==="pps" && x.name==="이윤")
+    .sort((x,y)=>num(x.amount_min)-num(y.amount_min));
+
+  if(!a.length)return"";
+
+  const bands=[
+    {label:"50억 미만",min:0,max:5000000000},
+    {label:"50~300억 미만",min:5000000000,max:30000000000}
+  ];
+
+  function getRate(b){
+    const r=a.find(x=>
+      num(x.amount_min)===b.min &&
+      num(x.amount_max)===b.max
+    );
+    return r ? `${fmt(r.value)}%` : "-";
+  }
+
+  const latest=a[0];
+
+  return `
+    <article class="rateTableCard">
+      <div class="cat">조달청 분석요율</div>
+      <div class="rateTableTitle">이윤</div>
+      <div class="rateTableSub">추정가격별 적용요율 (300억 미만)</div>
+
+      <div class="rateTableWrap">
+        <table class="rateTable">
+          <thead>
+            <tr>
+              ${bands.map(b=>`<th>${b.label}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              ${bands.map(b=>`<td>${getRate(b)}</td>`).join("")}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rateTableMeta">
+        적용기준: (노무비 + 경비 + 일반관리비) × 해당 요율<br>
+        기준금액: 추정가격<br>
+        적용일: ${latest?.effective_date||"-"}<br>
+        출처: ${latest?.source||"조달청"}
+      </div>
+    </article>
+  `;
+}
+
 function render(){
 
   let m=maps(),
@@ -392,7 +510,10 @@ function render(){
       (
         (x.name==="간접노무비" && x.construction_type==="산업설비") ||
         (x.name==="산업안전보건관리비" &&
-          ["건축공사","토목공사","특수건설공사"].includes(x.construction_type))
+          ["건축공사","토목공사","특수건설공사"].includes(x.construction_type)) ||
+        (x.name==="일반관리비" &&
+          ["토목","조경","산업설비","전문","전기","소방"].includes(x.construction_type)) ||
+        x.name==="이윤"
       )
     )
   );
@@ -414,10 +535,26 @@ function render(){
       ["산업안전보건관리비","산안비","건축공사","토목공사","특수건설공사","조달청"].some(t=>t.includes(query)||query.includes(t))
     );
 
+  const showGeneralAdmin=
+    showSpecial &&
+    (
+      !query ||
+      ["일반관리비","토목","조경","산업설비","전문","전기","소방","조달청"].some(t=>t.includes(query)||query.includes(t))
+    );
+
+  const showProfit=
+    showSpecial &&
+    (
+      !query ||
+      ["이윤","조달청","추정가격"].some(t=>t.includes(query)||query.includes(t))
+    );
+
   let html="";
 
   if(showIndirect) html+=indirectLaborTable(rows);
   if(showSafety) html+=safetyHealthTable(rows);
+  if(showGeneralAdmin) html+=generalAdminTable(rows);
+  if(showProfit) html+=profitTable(rows);
 
   html+=normalRows.map(x=>`
     <article class="card">
