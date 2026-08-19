@@ -1,19 +1,245 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cost Diary</title><style>
-body{margin:0;background:#f4f6f8;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.w{max-width:900px;margin:auto;padding:28px 16px}h1{margin:5px 0}.sub,.meta,#status{color:#667085}.search,.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px}.search{padding:12px;margin:22px 0 12px}input{width:100%;box-sizing:border-box;border:0;outline:0;padding:10px;font-size:17px}.tabs{display:flex;gap:7px;overflow:auto}.tabs button{white-space:nowrap;border:1px solid #e5e7eb;background:#fff;border-radius:999px;padding:8px 11px;font-weight:700}.tabs .on{background:#111827;color:white}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{padding:17px}.cat{font-size:12px;color:#2563eb;font-weight:800}.name{font-size:18px;font-weight:800;margin-top:6px}.val{font-size:28px;font-weight:900;margin:15px 0}.unit,.meta,#status{font-size:12px}.meta{border-top:1px solid #e5e7eb;padding-top:10px;line-height:1.7}.warn{margin-top:15px;background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:13px;font-size:12px;line-height:1.6}@media(max-width:650px){.grid{grid-template-columns:1fr}}
-</style></head><body><div class="w"><div style="font-size:11px;color:#2563eb;font-weight:800">COST REFERENCE DATA</div><h1>Cost Diary</h1><div class="sub">노임단가 · 조달청 법정경비 · 엔지니어링 노임 통합조회</div>
-<div class="search"><input id="q" placeholder="예: 플랜트배관공, 건강보험, 기계 고급"><div class="tabs"><button class="on" data-c="all">전체</button><button data-c="labor">개별직종 노임</button><button data-c="pps">조달청 법정경비</button><button data-c="engineering">엔지니어링</button></div></div><div id="status"></div><div id="grid" class="grid"></div><div id="warn" class="warn" hidden>Supabase 연결 전입니다. 파일 안의 SUPABASE_URL과 SUPABASE_KEY를 입력하면 standards DB와 연결됩니다.</div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
-const SUPABASE_URL="https://brjtygwrlsllyxyqsatx.supabase.co";
-const SUPABASE_KEY="sb_publishable_WkxzKOcm1BI3QT_YCsMOxw_75fg5zVc";
-const fallback=[
-{id:1,category:"labor",category_label:"개별직종 노임",subcategory:"플랜트",name:"플랜트배관공",grade:null,value:320480,unit:"원 / 1일",year:2026,period:"상반기",effective_date:"2026-01-01",source:"대한건설협회",keywords:["플랜트","배관"]},
-{id:2,category:"pps",category_label:"조달청 법정경비",subcategory:"보험료",name:"건강보험료",grade:null,value:3.595,unit:"%",year:2026,period:"연간",effective_date:"2026-01-01",source:"조달청",keywords:["건강보험","법정경비"]},
-{id:3,category:"engineering",category_label:"엔지니어링 노임",subcategory:"기계·설비",name:"기술자",grade:"특급",value:401407,unit:"원 / 1일",year:2026,period:"연간",effective_date:"2026-01-01",source:"한국엔지니어링협회",keywords:["기계","특급"]},
-{id:4,category:"engineering",category_label:"엔지니어링 노임",subcategory:"기계·설비",name:"기술자",grade:"고급",value:335379,unit:"원 / 1일",year:2026,period:"연간",effective_date:"2026-01-01",source:"한국엔지니어링협회",keywords:["기계","고급"]},
-{id:5,category:"engineering",category_label:"엔지니어링 노임",subcategory:"기계·설비",name:"기술자",grade:"중급",value:300463,unit:"원 / 1일",year:2026,period:"연간",effective_date:"2026-01-01",source:"한국엔지니어링협회",keywords:["기계","중급"]},
-{id:6,category:"engineering",category_label:"엔지니어링 노임",subcategory:"기계·설비",name:"기술자",grade:"초급",value:263602,unit:"원 / 1일",year:2026,period:"연간",effective_date:"2026-01-01",source:"한국엔지니어링협회",keywords:["기계","초급"]}];
-let rows=[],cat="all";const q=document.querySelector("#q"),g=document.querySelector("#grid"),s=document.querySelector("#status");
-function render(){let t=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),r=rows.filter(x=>(cat==="all"||x.category===cat)&&t.every(v=>[x.name,x.grade||"",x.subcategory||"",...(x.keywords||[])].join(" ").toLowerCase().includes(v)));s.textContent=r.length+"개 기준값 조회됨";g.innerHTML=r.map(x=>`<div class="card"><div class="cat">${x.category_label}</div><div class="name">${x.name}${x.grade?" · "+x.grade:""}</div><div class="sub">${x.subcategory||""}</div><div class="val">${Number(x.value).toLocaleString("ko-KR")} <span class="unit">${x.unit}</span></div><div class="meta">기준: ${x.year}년 ${x.period||""}<br>적용일: ${x.effective_date}<br>출처: ${x.source}</div></div>`).join("")||"<div>검색 결과 없음</div>"}
-document.querySelectorAll("button").forEach(b=>b.onclick=()=>{document.querySelectorAll("button").forEach(x=>x.classList.remove("on"));b.classList.add("on");cat=b.dataset.c;render()});q.oninput=render;
-(async()=>{if(SUPABASE_URL.startsWith("PASTE_")){rows=fallback;document.querySelector("#warn").hidden=false;render();return}try{let c=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),r=await c.from("standards").select("*").eq("is_active",true);if(r.error)throw r.error;rows=r.data;render()}catch(e){rows=fallback;s.textContent="DB 연결 실패 · 샘플 표시";render()}})();
-</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cost Diary | Cost Reference</title>
+<meta name="description" content="구매·공사 원가 기준정보 통합조회">
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --text:#111827; --muted:#667085;
+  --line:#e5e7eb; --blue:#2563eb; --dark:#111827; --soft:#eef4ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+}
+.wrap{max-width:980px;margin:auto;padding:28px 16px 64px}
+.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.kicker{font-size:11px;font-weight:900;color:var(--blue);letter-spacing:.11em}
+h1{margin:6px 0 7px;font-size:clamp(31px,6vw,48px);letter-spacing:-.05em}
+.desc{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+.brand{background:var(--dark);color:#fff;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:900}
+.searchPanel{
+  margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:13px;box-shadow:0 5px 18px rgba(0,0,0,.035)
+}
+.searchRow{display:flex;gap:8px}
+input,select{font:inherit}
+#q{
+  width:100%;border:0;outline:0;background:transparent;padding:10px 8px;font-size:17px
+}
+.tabs{display:flex;gap:7px;overflow:auto;padding-top:8px}
+.tab{
+  border:1px solid var(--line);background:#fff;color:#475467;border-radius:999px;
+  padding:9px 12px;font-weight:750;white-space:nowrap;cursor:pointer
+}
+.tab.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+.filters{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px
+}
+.filters select{
+  border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 11px;color:#344054
+}
+.status{margin:15px 2px 10px;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:19px;padding:18px;
+  box-shadow:0 3px 12px rgba(0,0,0,.02)
+}
+.cat{font-size:12px;color:var(--blue);font-weight:900}
+.name{font-size:19px;font-weight:900;margin-top:6px;letter-spacing:-.02em}
+.sub{font-size:13px;color:var(--muted);margin-top:4px}
+.val{font-size:30px;font-weight:950;letter-spacing:-.04em;margin-top:16px}
+.unit{font-size:12px;color:var(--muted);font-weight:800;margin-left:4px}
+.meta{border-top:1px solid var(--line);margin-top:15px;padding-top:11px;color:var(--muted);font-size:12.5px;line-height:1.68}
+.note{margin-top:7px;font-size:11.5px;color:#b54708}
+.empty{grid-column:1/-1;background:#fff;border:1px solid var(--line);border-radius:18px;padding:42px 20px;text-align:center;color:var(--muted)}
+.error{margin-top:14px;background:#fff1f2;border:1px solid #fecdd3;border-radius:14px;padding:13px;color:#9f1239;font-size:13px;line-height:1.6}
+footer{margin-top:22px;color:var(--muted);font-size:11px;line-height:1.65}
+@media(max-width:680px){
+  .grid{grid-template-columns:1fr}
+  .filters{grid-template-columns:1fr}
+  .hero{display:block}.brand{display:inline-block;margin-top:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="kicker">COST REFERENCE DATA</div>
+      <h1>Cost Diary</h1>
+      <p class="desc">구매·공사 원가 기준정보 통합조회</p>
+    </div>
+    <div class="brand">Cost Reference</div>
+  </section>
+
+  <section class="searchPanel">
+    <div class="searchRow">
+      <input id="q" placeholder="예: 플랜트배관공, 내선전공, 건강보험, 기계 고급">
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" data-c="all">전체</button>
+      <button class="tab" data-c="labor">개별직종 노임</button>
+      <button class="tab" data-c="pps">조달청 법정경비</button>
+      <button class="tab" data-c="engineering">엔지니어링</button>
+    </div>
+
+    <div class="filters">
+      <select id="yearFilter">
+        <option value="all">전체 연도</option>
+      </select>
+      <select id="periodFilter">
+        <option value="all">전체 적용기간</option>
+      </select>
+    </div>
+  </section>
+
+  <div id="status" class="status">데이터 불러오는 중...</div>
+  <section id="grid" class="grid"></section>
+  <div id="error" class="error" hidden></div>
+
+  <footer>
+    공식 공표자료의 출처·적용기간을 함께 관리합니다. 기준값은 Supabase 데이터베이스에서 실시간 조회됩니다.
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+  중요:
+  현재 GitHub index.html에 넣어둔 본인의 값으로 아래 두 줄만 교체하세요.
+*/
+const SUPABASE_URL = "https://brjtygwrlsllyxyqsatx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_WkxzKOcm1BI3QT_YCsMOxw_75fg5zVc";
+
+let rows = [];
+let activeCategory = "all";
+
+const q = document.getElementById("q");
+const grid = document.getElementById("grid");
+const status = document.getElementById("status");
+const yearFilter = document.getElementById("yearFilter");
+const periodFilter = document.getElementById("periodFilter");
+const errorBox = document.getElementById("error");
+
+function formatValue(v){
+  const n = Number(v);
+  if (Number.isNaN(n)) return v;
+  return n.toLocaleString("ko-KR", {maximumFractionDigits: 6});
+}
+
+function fillFilters(){
+  const years = [...new Set(rows.map(x => x.year).filter(Boolean))].sort((a,b)=>b-a);
+  const periods = [...new Set(rows.map(x => x.period).filter(Boolean))];
+
+  yearFilter.innerHTML = '<option value="all">전체 연도</option>' +
+    years.map(y => `<option value="${y}">${y}년</option>`).join("");
+
+  periodFilter.innerHTML = '<option value="all">전체 적용기간</option>' +
+    periods.map(p => `<option value="${p}">${p}</option>`).join("");
+}
+
+function render(){
+  const terms = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const y = yearFilter.value;
+  const p = periodFilter.value;
+
+  const filtered = rows.filter(x => {
+    if (activeCategory !== "all" && x.category !== activeCategory) return false;
+    if (y !== "all" && String(x.year) !== y) return false;
+    if (p !== "all" && String(x.period) !== p) return false;
+
+    const haystack = [
+      x.name || "",
+      x.grade || "",
+      x.subcategory || "",
+      x.category_label || "",
+      x.source || "",
+      x.note || "",
+      ...(Array.isArray(x.keywords) ? x.keywords : [])
+    ].join(" ").toLowerCase();
+
+    return terms.every(t => haystack.includes(t));
+  });
+
+  status.textContent = `${filtered.length.toLocaleString("ko-KR")}개 기준값 조회됨`;
+
+  if (!filtered.length){
+    grid.innerHTML = '<div class="empty">검색 결과가 없습니다.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(x => `
+    <article class="card">
+      <div class="cat">${x.category_label || ""}</div>
+      <div class="name">${x.name || ""}${x.grade ? " · " + x.grade : ""}</div>
+      <div class="sub">${x.subcategory || ""}</div>
+
+      <div class="val">
+        ${formatValue(x.value)}
+        <span class="unit">${x.unit || ""}</span>
+      </div>
+
+      <div class="meta">
+        기준: <b>${x.year || ""}년 ${x.period || ""}</b><br>
+        적용일: ${x.effective_date || "-"}<br>
+        출처: <b>${x.source || "-"}</b>
+        ${x.note ? `<div class="note">${x.note}</div>` : ""}
+      </div>
+    </article>
+  `).join("");
+}
+
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
+    btn.classList.add("on");
+    activeCategory = btn.dataset.c;
+    render();
+  });
+});
+
+q.addEventListener("input", render);
+yearFilter.addEventListener("change", render);
+periodFilter.addEventListener("change", render);
+
+async function load(){
+  try{
+    if (SUPABASE_URL.startsWith("PASTE_") || SUPABASE_KEY.startsWith("PASTE_")){
+      throw new Error("Supabase URL/Publishable key가 입력되지 않았습니다.");
+    }
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const { data, error } = await client
+      .from("standards")
+      .select("*")
+      .eq("is_active", true)
+      .order("year", {ascending:false})
+      .order("category", {ascending:true})
+      .order("name", {ascending:true});
+
+    if (error) throw error;
+
+    rows = data || [];
+    fillFilters();
+    render();
+
+  }catch(err){
+    console.error(err);
+    status.textContent = "데이터 연결 실패";
+    errorBox.hidden = false;
+    errorBox.textContent = "Supabase 연결을 확인해주세요. " + (err?.message || "");
+    grid.innerHTML = "";
+  }
+}
+
+load();
+</script>
+</body>
+</html>
