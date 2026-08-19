@@ -438,20 +438,34 @@ select{
 }
 
 .engAllTable{
-  min-width:760px;
+  min-width:680px;
   table-layout:fixed;
+}
+
+.engAllTable th,
+.engAllTable td{
+  padding:9px 7px;
 }
 
 .engAllTable td{
   white-space:nowrap;
-  font-size:13px;
+  font-size:12.5px;
 }
+
 .engAllTable th{
-  font-size:12px;
+  font-size:11.5px;
 }
+
 .engAllTable th:first-child,
 .engAllTable td:first-child{
-  width:150px;
+  width:112px;
+  padding-left:10px;
+  padding-right:8px;
+}
+
+.engAllTable th:not(:first-child),
+.engAllTable td:not(:first-child){
+  width:81px;
 }
 
 footer{
@@ -468,11 +482,58 @@ footer{
   .brand{display:inline-block;margin-top:12px}
 
   .rateTableCard{
-    padding:17px;
+    padding:14px;
   }
 
   .rateTableTitle{
-    font-size:20px;
+    font-size:19px;
+  }
+
+  .rateTableSub{
+    margin-bottom:12px;
+  }
+
+  .engTabs{
+    gap:5px;
+    padding-bottom:10px;
+  }
+
+  .engTab{
+    padding:7px 10px;
+    font-size:11px;
+  }
+
+  .engAllTable{
+    min-width:640px;
+  }
+
+  .engAllTable th,
+  .engAllTable td{
+    padding:8px 5px;
+  }
+
+  .engAllTable th{
+    font-size:10.5px;
+  }
+
+  .engAllTable td{
+    font-size:11.5px;
+  }
+
+  .engAllTable th:first-child,
+  .engAllTable td:first-child{
+    width:104px;
+    padding-left:7px;
+    padding-right:5px;
+  }
+
+  .engAllTable th:not(:first-child),
+  .engAllTable td:not(:first-child){
+    width:76px;
+  }
+
+  .rateTableMeta{
+    font-size:11px;
   }
 }
 </style>
