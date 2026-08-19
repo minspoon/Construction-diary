@@ -567,6 +567,20 @@ footer{
   color:var(--muted);
   font-size:11px;
   line-height:1.6;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.visitorCount{
+  white-space:nowrap;
+  font-weight:700;
+  color:#475467;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:6px 9px;
 }
 
 @media(max-width:680px){
@@ -655,11 +669,11 @@ footer{
 
 <div class="tabs">
   <button class="tab on" data-c="all">전체</button>
-  <button class="tab" data-c="labor">개별직종 노임단가</button>
-  <button class="tab" data-c="minimum_wage">최저임금</button>
+  <button class="tab" data-c="labor">개별직종 노임단가(공사)</button>
+  <button class="tab" data-c="engineering">엔지니어링(설계)</button>
   <button class="tab" data-c="pps">법정경비</button>
-  <button class="tab" data-c="engineering">엔지니어링</button>
   <button class="tab" data-c="price_index">물가지수</button>
+  <button class="tab" data-c="minimum_wage">최저임금</button>
 </div>
 
 <div class="filters">
@@ -684,7 +698,8 @@ footer{
 <main id="grid" class="grid"></main>
 
 <footer>
-공식 공표자료 기준 · 출처 및 적용일 관리 · 노임/최저임금/법정경비/엔지니어링/월별 물가지수 변동률 자동 계산
+  <div>공식 공표자료 기준 · 출처 및 적용일 관리 · 노임/최저임금/법정경비/엔지니어링/월별 물가지수 변동률 자동 계산</div>
+  <div id="visitorCount" class="visitorCount">누적 방문 집계중...</div>
 </footer>
 
 </div>
@@ -2752,6 +2767,40 @@ yf.onchange=render;
 pf.onchange=render;
 
 
+
+/* =====================================================
+   방문 카운터
+===================================================== */
+
+async function updateVisitorCount(s){
+
+  const el=document.getElementById("visitorCount");
+
+  try{
+
+    const {error:insertError}=await s
+      .from("page_views")
+      .insert({});
+
+    if(insertError) throw insertError;
+
+    const {count,error:countError}=await s
+      .from("page_views")
+      .select("*",{count:"exact",head:true});
+
+    if(countError) throw countError;
+
+    el.textContent=`누적 방문 ${Number(count||0).toLocaleString("ko-KR")}회`;
+
+  }catch(e){
+
+    console.warn("visitor count error",e);
+    el.textContent="누적 방문 -";
+
+  }
+}
+
+
 /* =====================================================
    Supabase
 ===================================================== */
@@ -2773,6 +2822,9 @@ pf.onchange=render;
       COST_DIARY_CONFIG.key
 
     );
+
+    // 누적 방문수 기록 및 조회
+    updateVisitorCount(s);
 
 
     /*
