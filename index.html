@@ -105,6 +105,99 @@ function history(x,m){
 }
 function render(){let m=maps(),terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),base=yf.value==="latest"?latest():rows.slice();let a=base.filter(x=>{if(cat!=="all"&&x.category!==cat)return false;if(yf.value!=="latest"&&yf.value!=="all"&&String(x.year)!==yf.value)return false;if(pf.value!=="all"&&x.period!==pf.value)return false;let h=[x.name,x.grade,x.subcategory,x.category_label,x.source,x.note,...(Array.isArray(x.keywords)?x.keywords:[])].filter(Boolean).join(" ").toLowerCase();return terms.every(t=>h.includes(t))}).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));status.textContent=`${a.length.toLocaleString()}개 기준값 조회됨`;grid.innerHTML=a.length?a.map(x=>`<article class="card"><div class="cat">${x.category_label||""}</div><div class="name">${x.name||""}${x.grade?" · "+x.grade:""}</div><div class="sub">${x.subcategory||""}</div><div class="val">${fmt(x.value)} <span class="unit">${x.unit||""}</span></div>${comparison(x,m)}${history(x,m)}<div class="meta">기준: ${x.year||""}년 ${x.period||""}<br>적용일: ${x.effective_date||"-"}<br>출처: ${x.source||"-"}</div></article>`).join(""):'<div class="empty">검색 결과가 없습니다.</div>'}
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(z=>z.classList.remove("on"));b.classList.add("on");cat=b.dataset.c;render()});q.oninput=render;yf.onchange=render;pf.onchange=render;
-(async()=>{try{if(!window.COST_DIARY_CONFIG)throw Error("config.js 연결정보 없음");const s=supabase.createClient(COST_DIARY_CONFIG.url,COST_DIARY_CONFIG.key);const{data,error}=await s.from("standards").select("*").eq("is_active",true).order("year").order("effective_date");if(error)throw error;rows=data||[];filters();render()}catch(e){status.textContent="데이터 연결 실패";grid.innerHTML=`<div class="error">${e.message}</div>`}})();
+(async()=>{
+  try{
+    if(!window.COST_DIARY_CONFIG) throw Error("config.js 연결정보 없음");
+
+    const s=supabase.createClient(
+      COST_DIARY_CONFIG.url,
+      COST_DIARY_CONFIG.key
+    );
+
+    // 기존 기준정보
+    const standardsRes=await s
+      .from("standards")
+      .select("*")
+      .eq("is_active",true)
+      .order("year")
+      .order("effective_date");
+
+    if(standardsRes.error) throw standardsRes.error;
+
+    // 조달청 간접공사비/법정경비
+    const ppsRes=await s
+      .from("pps_rates")
+      .select("*")
+      .eq("is_active",true)
+      .order("effective_date")
+      .order("id");
+
+    if(ppsRes.error) throw ppsRes.error;
+
+    const ppsRows=(ppsRes.data||[]).map(x=>{
+      const d=x.effective_date ? new Date(x.effective_date) : null;
+
+      return {
+        id:"pps_"+x.id,
+        category:"pps",
+        category_label:x.expense_group||"법정경비",
+
+        name:x.expense_name,
+
+        subcategory:[
+          x.construction_type,
+          x.construction_subtype
+        ].filter(Boolean).join(" · "),
+
+        grade:null,
+
+        value:x.rate,
+        unit:"%",
+
+        year:d ? d.getFullYear() : null,
+        period:d
+          ? `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}`
+          : "",
+
+        effective_date:x.effective_date,
+
+        source:x.source||"조달청",
+
+        note:[
+          x.calculation_base
+            ? `적용기준: ${x.calculation_base}`
+            : "",
+          x.formula_text||"",
+          x.base_amount
+            ? `기초액: ${Number(x.base_amount).toLocaleString("ko-KR")}원`
+            : "",
+          x.note||""
+        ].filter(Boolean).join(" / "),
+
+        keywords:[
+          x.expense_name,
+          x.expense_group,
+          x.construction_type,
+          x.construction_subtype,
+          x.calculation_base
+        ].filter(Boolean),
+
+        is_active:true
+      };
+    });
+
+    rows=[
+      ...(standardsRes.data||[]),
+      ...ppsRows
+    ];
+
+    filters();
+    render();
+
+  }catch(e){
+    status.textContent="데이터 연결 실패";
+    grid.innerHTML=`<div class="error">${e.message}</div>`;
+  }
+})();
 </script>
 </body></html>
