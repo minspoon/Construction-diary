@@ -438,11 +438,20 @@ select{
 }
 
 .engAllTable{
-  min-width:920px;
+  min-width:760px;
+  table-layout:fixed;
 }
 
 .engAllTable td{
   white-space:nowrap;
+  font-size:13px;
+}
+.engAllTable th{
+  font-size:12px;
+}
+.engAllTable th:first-child,
+.engAllTable td:first-child{
+  width:150px;
 }
 
 footer{
@@ -532,7 +541,7 @@ footer{
 
 let rows=[];
 let cat="all";
-let engineeringType="기계·설비";
+let engineeringType="전체보기";
 
 const q=document.getElementById("q");
 const grid=document.getElementById("grid");
@@ -1634,7 +1643,7 @@ function engineeringTable(data){
   a.forEach(x=>{
 
     const k=
-      `${x.subcategory||""}|${x.grade||""}`;
+      `${x.subcategory||""}|${x.grade||x.name||""}`;
 
     const old=latestMap.get(k);
 
@@ -2005,14 +2014,14 @@ function engineeringTable(data){
 function engineeringTabs(){
 
   const types=[
+    "전체보기",
     "기계·설비",
     "전기",
     "정보통신",
     "건설",
     "환경",
     "원자력",
-    "기타",
-    "전체보기"
+    "기타"
   ];
 
 
