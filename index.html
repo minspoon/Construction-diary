@@ -28,7 +28,7 @@ footer{margin-top:24px;color:var(--muted);font-size:11px;line-height:1.6}@media(
 <input id="q" placeholder="예: 플랜트배관공, 최저임금, 건강보험, 기계 고급">
 <div class="tabs">
 <button class="tab on" data-c="all">전체</button>
-<button class="tab" data-c="labor">개별직종 노임</button>
+<button class="tab" data-c="labor">개별직종 노임단가</button>
 <button class="tab" data-c="minimum_wage">최저임금</button>
 <button class="tab" data-c="pps">법정경비</button>
 <button class="tab" data-c="engineering">엔지니어링</button>
@@ -58,7 +58,12 @@ function comparison(x,m){
  let prior=[...a].reverse().find(z=>num(z.year)===num(x.year)-1);
  return`<div class="compare"><span class="${cls(pc(x.value,prior?.value))}">전년 대비 ${pt(pc(x.value,prior?.value))}</span></div>`;
 }
-function history(x,m){let a=(m.get(key(x))||[]).slice(x.category==="labor"?-5:-3);if(a.length<2)return"";let mx=Math.max(...a.map(z=>num(z.value)||0));return`<div class="history"><div class="historyTitle">${x.category==="labor"?"최근 5개 시점":"최근 3개년"} 추이</div>${a.map(z=>`<div class="hist"><span>${z.year}${z.period==="상반기"?" 상":z.period==="하반기"?" 하":""}</span><div class="bar"><div class="fill" style="width:${mx?Math.max(8,num(z.value)/mx*100):0}%"></div></div><b>${fmt(z.value)}</b></div>`).join("")}</div>`}
+function history(x,m){
+ let a=(m.get(key(x))||[]).slice(x.category==="labor"?-5:-3).reverse();
+ if(a.length<2)return"";
+ let mx=Math.max(...a.map(z=>num(z.value)||0));
+ return`<div class="history"><div class="historyTitle">${x.category==="labor"?"최근 5개 시점":"최근 3개년"} 추이</div>${a.map((z,i)=>`<div class="hist ${i===0?"latestHist":""}"><span>${z.year}${z.period==="상반기"?" 상":z.period==="하반기"?" 하":""}${i===0?' <em class="latestBadge">최신</em>':""}</span><div class="bar"><div class="fill ${i===0?"latestFill":""}" style="width:${mx?Math.max(8,num(z.value)/mx*100):0}%"></div></div><b>${fmt(z.value)}</b></div>`).join("")}</div>`
+}
 function render(){let m=maps(),terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),base=yf.value==="latest"?latest():rows.slice();let a=base.filter(x=>{if(cat!=="all"&&x.category!==cat)return false;if(yf.value!=="latest"&&yf.value!=="all"&&String(x.year)!==yf.value)return false;if(pf.value!=="all"&&x.period!==pf.value)return false;let h=[x.name,x.grade,x.subcategory,x.category_label,x.source,x.note,...(Array.isArray(x.keywords)?x.keywords:[])].filter(Boolean).join(" ").toLowerCase();return terms.every(t=>h.includes(t))}).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));status.textContent=`${a.length.toLocaleString()}개 기준값 조회됨`;grid.innerHTML=a.length?a.map(x=>`<article class="card"><div class="cat">${x.category_label||""}</div><div class="name">${x.name||""}${x.grade?" · "+x.grade:""}</div><div class="sub">${x.subcategory||""}</div><div class="val">${fmt(x.value)} <span class="unit">${x.unit||""}</span></div>${comparison(x,m)}${history(x,m)}<div class="meta">기준: ${x.year||""}년 ${x.period||""}<br>적용일: ${x.effective_date||"-"}<br>출처: ${x.source||"-"}</div></article>`).join(""):'<div class="empty">검색 결과가 없습니다.</div>'}
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(z=>z.classList.remove("on"));b.classList.add("on");cat=b.dataset.c;render()});q.oninput=render;yf.onchange=render;pf.onchange=render;
 (async()=>{try{if(!window.COST_DIARY_CONFIG)throw Error("config.js 연결정보 없음");const s=supabase.createClient(COST_DIARY_CONFIG.url,COST_DIARY_CONFIG.key);const{data,error}=await s.from("standards").select("*").eq("is_active",true).order("year").order("effective_date");if(error)throw error;rows=data||[];filters();render()}catch(e){status.textContent="데이터 연결 실패";grid.innerHTML=`<div class="error">${e.message}</div>`}})();
