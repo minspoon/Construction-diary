@@ -61,6 +61,14 @@
   font-size:12px;
   line-height:1.7;
 }
+
+.rateExtra{display:block;margin-top:3px;font-size:11px;font-weight:600;color:var(--muted)}
+.rateMulti{min-width:210px}
+.rateSplit{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:3px 0;font-size:11px;color:var(--muted)}
+.rateSplit+ .rateSplit{border-top:1px dashed var(--line);margin-top:4px;padding-top:7px}
+.rateSplit strong{font-size:14px;color:var(--text);white-space:nowrap}
+.safetyTable td{vertical-align:middle}
+
 :root{--bg:#f4f6f8;--card:#fff;--text:#111827;--muted:#667085;--line:#e5e7eb;--blue:#2563eb;--green:#067647;--red:#b42318;--dark:#111827}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif}
 .wrap{max-width:980px;margin:auto;padding:30px 16px 64px}.hero{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
@@ -174,21 +182,9 @@ function indirectLaborTable(data){
   if(!a.length)return"";
 
   const amountBands=[
-    {
-      label:"10억 미만",
-      min:0,
-      max:1000000000
-    },
-    {
-      label:"10~50억 미만",
-      min:1000000000,
-      max:5000000000
-    },
-    {
-      label:"50~300억 미만",
-      min:5000000000,
-      max:30000000000
-    }
+    {label:"10억 미만",min:0,max:1000000000},
+    {label:"10~50억 미만",min:1000000000,max:5000000000},
+    {label:"50~300억 미만",min:5000000000,max:30000000000}
   ];
 
   const periods=[
@@ -209,7 +205,6 @@ function indirectLaborTable(data){
           : num(x.period_max_days)===p.max
       )
     );
-
     return r ? `${fmt(r.value)}%` : "-";
   }
 
@@ -217,16 +212,9 @@ function indirectLaborTable(data){
 
   return `
     <article class="rateTableCard">
-
       <div class="cat">조달청 분석요율</div>
-
-      <div class="rateTableTitle">
-        간접노무비
-      </div>
-
-      <div class="rateTableSub">
-        산업설비 · 직접공사비 / 공사기간별 적용요율
-      </div>
+      <div class="rateTableTitle">간접노무비</div>
+      <div class="rateTableSub">산업설비 · 직접공사비 / 공사기간별 적용요율</div>
 
       <div class="rateTableWrap">
         <table class="rateTable">
@@ -236,14 +224,11 @@ function indirectLaborTable(data){
               ${periods.map(p=>`<th>${p.label}</th>`).join("")}
             </tr>
           </thead>
-
           <tbody>
             ${amountBands.map(b=>`
               <tr>
                 <td>${b.label}</td>
-                ${periods.map(p=>`
-                  <td>${getRate(b,p)}</td>
-                `).join("")}
+                ${periods.map(p=>`<td>${getRate(b,p)}</td>`).join("")}
               </tr>
             `).join("")}
           </tbody>
@@ -255,11 +240,116 @@ function indirectLaborTable(data){
         적용일: ${latest?.effective_date||"-"}<br>
         출처: ${latest?.source||"조달청"}
       </div>
-
     </article>
   `;
 }
- function render(){
+
+function safetyHealthTable(data){
+
+  const a=data
+    .filter(x =>
+      x.category==="pps" &&
+      x.name==="산업안전보건관리비" &&
+      ["건축공사","토목공사","특수건설공사"].includes(x.construction_type)
+    )
+    .sort((x,y)=>
+      (x.construction_type||"").localeCompare(y.construction_type||"","ko") ||
+      num(x.amount_min)-num(y.amount_min) ||
+      num(x.rate)-num(y.rate)
+    );
+
+  if(!a.length)return"";
+
+  const types=["건축공사","토목공사","특수건설공사"];
+
+  function rowsFor(type){
+    return a.filter(x=>x.construction_type===type);
+  }
+
+  function band(type,min,max){
+    return rowsFor(type).find(x =>
+      num(x.amount_min)===min &&
+      (
+        max===null
+          ? x.amount_max===null
+          : num(x.amount_max)===max
+      )
+    );
+  }
+
+  function rateText(r){
+    if(!r)return"-";
+    const base=num(r.base_amount);
+    if(base>0){
+      return `${fmt(r.value)}% <span class="rateExtra">+ ${fmt(base/10000)}만원</span>`;
+    }
+    return `${fmt(r.value)}%`;
+  }
+
+  function over50(type){
+    const rs=rowsFor(type)
+      .filter(x=>num(x.amount_min)===5000000000)
+      .sort((x,y)=>num(x.rate)-num(y.rate));
+
+    if(!rs.length)return"-";
+
+    return rs.map(r=>{
+      let label="";
+      if(type==="토목공사"){
+        label=(r.note||"").includes("1,000억원 이상")
+          ?"추정금액 1,000억 이상"
+          :"추정금액 1,000억 미만";
+      }else{
+        label=(r.note||"").includes("800억원 이상")
+          ?"추정금액 800억 이상"
+          :"추정금액 800억 미만";
+      }
+      return `<div class="rateSplit"><span>${label}</span><strong>${fmt(r.value)}%</strong></div>`;
+    }).join("");
+  }
+
+  const latest=a[0];
+
+  return `
+    <article class="rateTableCard">
+      <div class="cat">법정경비</div>
+      <div class="rateTableTitle">산업안전보건관리비</div>
+      <div class="rateTableSub">공종 · 대상액 구간별 적용요율</div>
+
+      <div class="rateTableWrap">
+        <table class="rateTable safetyTable">
+          <thead>
+            <tr>
+              <th>공종</th>
+              <th>5억 미만</th>
+              <th>5~50억 미만</th>
+              <th>50억 이상</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${types.map(type=>`
+              <tr>
+                <td>${type}</td>
+                <td>${rateText(band(type,0,500000000))}</td>
+                <td>${rateText(band(type,500000000,5000000000))}</td>
+                <td class="rateMulti">${over50(type)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rateTableMeta">
+        적용대상: 총공사금액 2천만원 이상 건설공사<br>
+        대상액: 재료비 + 직접노무비 + 도급자설치 관급금액<br>
+        적용일: ${latest?.effective_date||"-"}<br>
+        출처: ${latest?.source||"조달청"}
+      </div>
+    </article>
+  `;
+}
+
+function render(){
 
   let m=maps(),
       terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),
@@ -296,62 +386,65 @@ function indirectLaborTable(data){
     (a.name||"").localeCompare(b.name||"","ko")
   );
 
-  // 간접노무비는 개별 카드에서 제외
   const normalRows=a.filter(x=>
     !(
       x.category==="pps" &&
-      x.name==="간접노무비" &&
-      x.construction_type==="산업설비"
+      (
+        (x.name==="간접노무비" && x.construction_type==="산업설비") ||
+        (x.name==="산업안전보건관리비" &&
+          ["건축공사","토목공사","특수건설공사"].includes(x.construction_type))
+      )
     )
   );
 
+  const showSpecial=cat==="pps" || cat==="all";
+  const query=q.value.toLowerCase().trim();
+
+  const showIndirect=
+    showSpecial &&
+    (
+      !query ||
+      ["간접노무비","산업설비","직접공사비","공사기간","조달청"].some(t=>t.includes(query)||query.includes(t))
+    );
+
+  const showSafety=
+    showSpecial &&
+    (
+      !query ||
+      ["산업안전보건관리비","산안비","건축공사","토목공사","특수건설공사","조달청"].some(t=>t.includes(query)||query.includes(t))
+    );
+
   let html="";
 
-  // 법정경비 탭 또는 전체에서 간접노무비 표 표시
-  if(cat==="pps" || cat==="all"){
-    html+=indirectLaborTable(rows);
-  }
+  if(showIndirect) html+=indirectLaborTable(rows);
+  if(showSafety) html+=safetyHealthTable(rows);
 
   html+=normalRows.map(x=>`
     <article class="card">
-
-      <div class="cat">
-        ${x.category_label||""}
-      </div>
-
-      <div class="name">
-        ${x.name||""}${x.grade?" · "+x.grade:""}
-      </div>
-
-      <div class="sub">
-        ${x.subcategory||""}
-      </div>
-
+      <div class="cat">${x.category_label||""}</div>
+      <div class="name">${x.name||""}${x.grade?" · "+x.grade:""}</div>
+      <div class="sub">${x.subcategory||""}</div>
       <div class="val">
         ${fmt(x.value)}
         <span class="unit">${x.unit||""}</span>
       </div>
-
       ${comparison(x,m)}
-
       ${history(x,m)}
-
       <div class="meta">
         기준: ${x.year||""}년 ${x.period||""}<br>
         적용일: ${x.effective_date||"-"}<br>
         출처: ${x.source||"-"}
       </div>
-
     </article>
   `).join("");
 
-  status.textContent=
-    `${a.length.toLocaleString()}개 기준값 조회됨`;
+  status.textContent=`${a.length.toLocaleString()}개 기준값 조회됨`;
 
   grid.innerHTML=
     html ||
     '<div class="empty">검색 결과가 없습니다.</div>';
 }
+
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(z=>z.classList.remove("on"));b.classList.add("on");cat=b.dataset.c;render()});q.oninput=render;yf.onchange=render;pf.onchange=render;
 (async()=>{
   try{
