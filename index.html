@@ -6,240 +6,61 @@
 <title>Cost Diary | Cost Reference</title>
 <meta name="description" content="구매·공사 원가 기준정보 통합조회">
 <style>
-:root{
-  --bg:#f4f6f8; --card:#ffffff; --text:#111827; --muted:#667085;
-  --line:#e5e7eb; --blue:#2563eb; --dark:#111827; --soft:#eef4ff;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:var(--bg); color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
-}
-.wrap{max-width:980px;margin:auto;padding:28px 16px 64px}
-.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-.kicker{font-size:11px;font-weight:900;color:var(--blue);letter-spacing:.11em}
-h1{margin:6px 0 7px;font-size:clamp(31px,6vw,48px);letter-spacing:-.05em}
-.desc{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
-.brand{background:var(--dark);color:#fff;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:900}
-.searchPanel{
-  margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:20px;
-  padding:13px;box-shadow:0 5px 18px rgba(0,0,0,.035)
-}
-.searchRow{display:flex;gap:8px}
-input,select{font:inherit}
-#q{
-  width:100%;border:0;outline:0;background:transparent;padding:10px 8px;font-size:17px
-}
-.tabs{display:flex;gap:7px;overflow:auto;padding-top:8px}
-.tab{
-  border:1px solid var(--line);background:#fff;color:#475467;border-radius:999px;
-  padding:9px 12px;font-weight:750;white-space:nowrap;cursor:pointer
-}
-.tab.on{background:var(--dark);color:#fff;border-color:var(--dark)}
-.filters{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px
-}
-.filters select{
-  border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 11px;color:#344054
-}
-.status{margin:15px 2px 10px;color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.card{
-  background:var(--card);border:1px solid var(--line);border-radius:19px;padding:18px;
-  box-shadow:0 3px 12px rgba(0,0,0,.02)
-}
-.cat{font-size:12px;color:var(--blue);font-weight:900}
-.name{font-size:19px;font-weight:900;margin-top:6px;letter-spacing:-.02em}
-.sub{font-size:13px;color:var(--muted);margin-top:4px}
-.val{font-size:30px;font-weight:950;letter-spacing:-.04em;margin-top:16px}
-.unit{font-size:12px;color:var(--muted);font-weight:800;margin-left:4px}
-.meta{border-top:1px solid var(--line);margin-top:15px;padding-top:11px;color:var(--muted);font-size:12.5px;line-height:1.68}
-.note{margin-top:7px;font-size:11.5px;color:#b54708}
-.empty{grid-column:1/-1;background:#fff;border:1px solid var(--line);border-radius:18px;padding:42px 20px;text-align:center;color:var(--muted)}
-.error{margin-top:14px;background:#fff1f2;border:1px solid #fecdd3;border-radius:14px;padding:13px;color:#9f1239;font-size:13px;line-height:1.6}
-footer{margin-top:22px;color:var(--muted);font-size:11px;line-height:1.65}
-@media(max-width:680px){
-  .grid{grid-template-columns:1fr}
-  .filters{grid-template-columns:1fr}
-  .hero{display:block}.brand{display:inline-block;margin-top:12px}
-}
+:root{--bg:#f4f6f8;--card:#fff;--text:#111827;--muted:#667085;--line:#e5e7eb;--blue:#2563eb;--green:#067647;--red:#b42318;--dark:#111827}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif}
+.wrap{max-width:980px;margin:auto;padding:30px 16px 64px}.hero{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
+.kicker{font-size:11px;font-weight:900;color:var(--blue);letter-spacing:.12em}h1{margin:6px 0;font-size:clamp(34px,7vw,50px);letter-spacing:-.05em}.desc{color:var(--muted);font-size:14px}.brand{background:var(--dark);color:white;padding:9px 12px;border-radius:999px;font-size:12px;font-weight:900}
+.panel{margin-top:22px;background:white;border:1px solid var(--line);border-radius:20px;padding:14px}#q{width:100%;border:0;outline:0;padding:10px 7px;font-size:17px;background:transparent}
+.tabs{display:flex;gap:7px;overflow:auto;padding-top:8px}.tab{border:1px solid var(--line);background:white;border-radius:999px;padding:9px 12px;white-space:nowrap;font-weight:800;color:#475467}.tab.on{background:var(--dark);border-color:var(--dark);color:white}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}select{border:1px solid var(--line);border-radius:12px;background:white;padding:10px}
+.status{margin:15px 2px 10px;color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.card{background:white;border:1px solid var(--line);border-radius:19px;padding:18px}
+.cat{font-size:12px;color:var(--blue);font-weight:900}.name{font-size:20px;font-weight:950;margin-top:6px}.sub{font-size:13px;color:var(--muted);margin-top:4px}.val{font-size:31px;font-weight:950;letter-spacing:-.04em;margin-top:16px}.unit{font-size:12px;color:var(--muted);font-weight:800}
+.compare{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.pill{font-size:11.5px;border-radius:999px;padding:6px 8px;background:#f2f4f7;font-weight:800}.up{background:#ecfdf3;color:var(--green)}.down{background:#fef3f2;color:var(--red)}
+.history{margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}.historyTitle{font-size:12px;font-weight:900;margin-bottom:7px}.hist{display:grid;grid-template-columns:72px 1fr auto;gap:8px;align-items:center;font-size:12px;padding:5px 0}.bar{height:7px;background:#e8eef8;border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--blue);border-radius:99px}
+.meta{border-top:1px solid var(--line);margin-top:14px;padding-top:11px;color:var(--muted);font-size:12px;line-height:1.7}.empty,.error{grid-column:1/-1;background:white;border:1px solid var(--line);border-radius:18px;padding:30px;text-align:center;color:var(--muted)}
+footer{margin-top:24px;color:var(--muted);font-size:11px;line-height:1.6}@media(max-width:680px){.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.hero{display:block}.brand{display:inline-block;margin-top:12px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <section class="hero">
-    <div>
-      <div class="kicker">COST REFERENCE DATA</div>
-      <h1>Cost Diary</h1>
-      <p class="desc">구매·공사 원가 기준정보 통합조회</p>
-    </div>
-    <div class="brand">Cost Reference</div>
-  </section>
-
-  <section class="searchPanel">
-    <div class="searchRow">
-      <input id="q" placeholder="예: 플랜트배관공, 내선전공, 건강보험, 기계 고급">
-    </div>
-
-    <div class="tabs">
-      <button class="tab on" data-c="all">전체</button>
-      <button class="tab" data-c="labor">개별직종 노임</button>
-      <button class="tab" data-c="pps">조달청 법정경비</button>
-      <button class="tab" data-c="engineering">엔지니어링</button>
-    </div>
-
-    <div class="filters">
-      <select id="yearFilter">
-        <option value="all">전체 연도</option>
-      </select>
-      <select id="periodFilter">
-        <option value="all">전체 적용기간</option>
-      </select>
-    </div>
-  </section>
-
-  <div id="status" class="status">데이터 불러오는 중...</div>
-  <section id="grid" class="grid"></section>
-  <div id="error" class="error" hidden></div>
-
-  <footer>
-    공식 공표자료의 출처·적용기간을 함께 관리합니다. 기준값은 Supabase 데이터베이스에서 실시간 조회됩니다.
-  </footer>
+<header class="hero"><div><div class="kicker">COST REFERENCE DATA</div><h1>Cost Diary</h1><div class="desc">구매·공사 원가 기준정보 통합조회</div></div><div class="brand">Cost Reference</div></header>
+<section class="panel">
+<input id="q" placeholder="예: 플랜트배관공, 최저임금, 건강보험, 기계 고급">
+<div class="tabs">
+<button class="tab on" data-c="all">전체</button>
+<button class="tab" data-c="labor">개별직종 노임</button>
+<button class="tab" data-c="minimum_wage">최저임금</button>
+<button class="tab" data-c="pps">법정경비</button>
+<button class="tab" data-c="engineering">엔지니어링</button>
 </div>
-
+<div class="filters"><select id="year"><option value="latest">최신 기준</option><option value="all">전체 연도</option></select><select id="period"><option value="all">전체 적용기간</option></select></div>
+</section>
+<div id="status" class="status">데이터 불러오는 중...</div><main id="grid" class="grid"></main>
+<footer>공식 공표자료 기준 · 출처 및 적용일 관리 · 변동률 자동 계산</footer>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./config.js"></script>
 <script>
-/*
-  중요:
-  현재 GitHub index.html에 넣어둔 본인의 값으로 아래 두 줄만 교체하세요.
-*/
-const SUPABASE_URL = "https://brjtygwrlsllyxyqsatx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_WkxzKOcm1BI3QT_YCsMOxw_75fg5zVc";
-
-let rows = [];
-let activeCategory = "all";
-
-const q = document.getElementById("q");
-const grid = document.getElementById("grid");
-const status = document.getElementById("status");
-const yearFilter = document.getElementById("yearFilter");
-const periodFilter = document.getElementById("periodFilter");
-const errorBox = document.getElementById("error");
-
-function formatValue(v){
-  const n = Number(v);
-  if (Number.isNaN(n)) return v;
-  return n.toLocaleString("ko-KR", {maximumFractionDigits: 6});
+let rows=[],cat="all";
+const q=document.getElementById("q"),grid=document.getElementById("grid"),status=document.getElementById("status"),yf=document.getElementById("year"),pf=document.getElementById("period");
+const num=v=>Number(v), fmt=v=>Number.isFinite(num(v))?num(v).toLocaleString("ko-KR",{maximumFractionDigits:6}):v;
+function rank(x){return num(x.year)*10+(x.period==="하반기"?2:x.period==="상반기"?1:3)}
+function key(x){return[x.category,x.subcategory||"",x.name||"",x.grade||"",x.unit||""].join("|")}
+function maps(){const m=new Map();rows.forEach(x=>{let k=key(x);if(!m.has(k))m.set(k,[]);m.get(k).push(x)});m.forEach(a=>a.sort((a,b)=>rank(a)-rank(b)));return m}
+function pc(a,b){return b&&num(b)!==0?(num(a)-num(b))/num(b)*100:null}
+function pt(v){return v===null?"-":(v>0?"+":"")+v.toFixed(2)+"%"}
+function cls(v){return"pill "+(v===null?"":v>0?"up":v<0?"down":"")}
+function latest(){let o=[];maps().forEach(a=>o.push(a[a.length-1]));return o}
+function filters(){let ys=[...new Set(rows.map(x=>x.year).filter(Boolean))].sort((a,b)=>b-a),ps=[...new Set(rows.map(x=>x.period).filter(Boolean))];yf.innerHTML='<option value="latest">최신 기준</option><option value="all">전체 연도</option>'+ys.map(y=>`<option>${y}</option>`).join("");pf.innerHTML='<option value="all">전체 적용기간</option>'+ps.map(p=>`<option>${p}</option>`).join("")}
+function comparison(x,m){
+ let a=m.get(key(x))||[],i=a.findIndex(z=>z.id===x.id),prev=i>0?a[i-1]:null,yoy=a.find(z=>num(z.year)===num(x.year)-1&&z.period===x.period);
+ if(x.category==="labor")return`<div class="compare"><span class="${cls(pc(x.value,prev?.value))}">직전 반기 ${pt(pc(x.value,prev?.value))}</span><span class="${cls(pc(x.value,yoy?.value))}">전년 동기 ${pt(pc(x.value,yoy?.value))}</span></div>`;
+ let prior=[...a].reverse().find(z=>num(z.year)===num(x.year)-1);
+ return`<div class="compare"><span class="${cls(pc(x.value,prior?.value))}">전년 대비 ${pt(pc(x.value,prior?.value))}</span></div>`;
 }
-
-function fillFilters(){
-  const years = [...new Set(rows.map(x => x.year).filter(Boolean))].sort((a,b)=>b-a);
-  const periods = [...new Set(rows.map(x => x.period).filter(Boolean))];
-
-  yearFilter.innerHTML = '<option value="all">전체 연도</option>' +
-    years.map(y => `<option value="${y}">${y}년</option>`).join("");
-
-  periodFilter.innerHTML = '<option value="all">전체 적용기간</option>' +
-    periods.map(p => `<option value="${p}">${p}</option>`).join("");
-}
-
-function render(){
-  const terms = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  const y = yearFilter.value;
-  const p = periodFilter.value;
-
-  const filtered = rows.filter(x => {
-    if (activeCategory !== "all" && x.category !== activeCategory) return false;
-    if (y !== "all" && String(x.year) !== y) return false;
-    if (p !== "all" && String(x.period) !== p) return false;
-
-    const haystack = [
-      x.name || "",
-      x.grade || "",
-      x.subcategory || "",
-      x.category_label || "",
-      x.source || "",
-      x.note || "",
-      ...(Array.isArray(x.keywords) ? x.keywords : [])
-    ].join(" ").toLowerCase();
-
-    return terms.every(t => haystack.includes(t));
-  });
-
-  status.textContent = `${filtered.length.toLocaleString("ko-KR")}개 기준값 조회됨`;
-
-  if (!filtered.length){
-    grid.innerHTML = '<div class="empty">검색 결과가 없습니다.</div>';
-    return;
-  }
-
-  grid.innerHTML = filtered.map(x => `
-    <article class="card">
-      <div class="cat">${x.category_label || ""}</div>
-      <div class="name">${x.name || ""}${x.grade ? " · " + x.grade : ""}</div>
-      <div class="sub">${x.subcategory || ""}</div>
-
-      <div class="val">
-        ${formatValue(x.value)}
-        <span class="unit">${x.unit || ""}</span>
-      </div>
-
-      <div class="meta">
-        기준: <b>${x.year || ""}년 ${x.period || ""}</b><br>
-        적용일: ${x.effective_date || "-"}<br>
-        출처: <b>${x.source || "-"}</b>
-        ${x.note ? `<div class="note">${x.note}</div>` : ""}
-      </div>
-    </article>
-  `).join("");
-}
-
-document.querySelectorAll(".tab").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
-    btn.classList.add("on");
-    activeCategory = btn.dataset.c;
-    render();
-  });
-});
-
-q.addEventListener("input", render);
-yearFilter.addEventListener("change", render);
-periodFilter.addEventListener("change", render);
-
-async function load(){
-  try{
-    if (SUPABASE_URL.startsWith("PASTE_") || SUPABASE_KEY.startsWith("PASTE_")){
-      throw new Error("Supabase URL/Publishable key가 입력되지 않았습니다.");
-    }
-
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const { data, error } = await client
-      .from("standards")
-      .select("*")
-      .eq("is_active", true)
-      .order("year", {ascending:false})
-      .order("category", {ascending:true})
-      .order("name", {ascending:true});
-
-    if (error) throw error;
-
-    rows = data || [];
-    fillFilters();
-    render();
-
-  }catch(err){
-    console.error(err);
-    status.textContent = "데이터 연결 실패";
-    errorBox.hidden = false;
-    errorBox.textContent = "Supabase 연결을 확인해주세요. " + (err?.message || "");
-    grid.innerHTML = "";
-  }
-}
-
-load();
+function history(x,m){let a=(m.get(key(x))||[]).slice(x.category==="labor"?-5:-3);if(a.length<2)return"";let mx=Math.max(...a.map(z=>num(z.value)||0));return`<div class="history"><div class="historyTitle">${x.category==="labor"?"최근 5개 시점":"최근 3개년"} 추이</div>${a.map(z=>`<div class="hist"><span>${z.year}${z.period==="상반기"?" 상":z.period==="하반기"?" 하":""}</span><div class="bar"><div class="fill" style="width:${mx?Math.max(8,num(z.value)/mx*100):0}%"></div></div><b>${fmt(z.value)}</b></div>`).join("")}</div>`}
+function render(){let m=maps(),terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean),base=yf.value==="latest"?latest():rows.slice();let a=base.filter(x=>{if(cat!=="all"&&x.category!==cat)return false;if(yf.value!=="latest"&&yf.value!=="all"&&String(x.year)!==yf.value)return false;if(pf.value!=="all"&&x.period!==pf.value)return false;let h=[x.name,x.grade,x.subcategory,x.category_label,x.source,x.note,...(Array.isArray(x.keywords)?x.keywords:[])].filter(Boolean).join(" ").toLowerCase();return terms.every(t=>h.includes(t))}).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));status.textContent=`${a.length.toLocaleString()}개 기준값 조회됨`;grid.innerHTML=a.length?a.map(x=>`<article class="card"><div class="cat">${x.category_label||""}</div><div class="name">${x.name||""}${x.grade?" · "+x.grade:""}</div><div class="sub">${x.subcategory||""}</div><div class="val">${fmt(x.value)} <span class="unit">${x.unit||""}</span></div>${comparison(x,m)}${history(x,m)}<div class="meta">기준: ${x.year||""}년 ${x.period||""}<br>적용일: ${x.effective_date||"-"}<br>출처: ${x.source||"-"}</div></article>`).join(""):'<div class="empty">검색 결과가 없습니다.</div>'}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(z=>z.classList.remove("on"));b.classList.add("on");cat=b.dataset.c;render()});q.oninput=render;yf.onchange=render;pf.onchange=render;
+(async()=>{try{if(!window.COST_DIARY_CONFIG)throw Error("config.js 연결정보 없음");const s=supabase.createClient(COST_DIARY_CONFIG.url,COST_DIARY_CONFIG.key);const{data,error}=await s.from("standards").select("*").eq("is_active",true).order("year").order("effective_date");if(error)throw error;rows=data||[];filters();render()}catch(e){status.textContent="데이터 연결 실패";grid.innerHTML=`<div class="error">${e.message}</div>`}})();
 </script>
-</body>
-</html>
+</body></html>
