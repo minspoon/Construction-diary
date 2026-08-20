@@ -610,6 +610,8 @@ footer{
 .marketSubTab.on{background:var(--dark);border-color:var(--dark);color:#fff}
 .marketCard{padding:16px}
 .marketCard .name{font-size:17px}
+.marketFlag{margin-right:6px;font-size:18px;vertical-align:-1px}
+.marketEnglish{color:var(--muted);font-size:13px;font-weight:600}
 .marketCard .val{font-size:27px;margin-top:11px}
 .marketDate{margin-top:9px;color:var(--muted);font-size:11px}
 .marketChange{display:inline-block;margin-top:9px;border-radius:999px;padding:5px 8px;background:#f2f4f7;font-size:11.5px;font-weight:800}
@@ -618,9 +620,14 @@ footer{
 
 
 /* HOME */
-.homeIntro{margin-top:24px}.homeTitle{margin:0;font-size:24px;font-weight:800;letter-spacing:-.03em}.homeSub{margin-top:6px;color:var(--muted);font-size:13px}.homeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}.homeCard{appearance:none;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;cursor:pointer;transition:.18s ease}.homeCard:hover{transform:translateY(-2px);border-color:#cbd5e1;box-shadow:0 8px 24px rgba(17,24,39,.06)}.homeIcon{font-size:25px}.homeCardTitle{margin-top:12px;font-size:20px;font-weight:800}.homeCardDesc{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.55}.homeBack{display:none;margin-bottom:10px;border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:800;cursor:pointer;padding:0}.homeMode .panel,.homeMode #status,.homeMode #grid{display:none}.homeMode #home{display:block}#home{display:none}.contactMail{color:#475467;font-weight:800;text-decoration:none}.contactMail:hover{color:var(--blue);text-decoration:underline}
+.homeIntro{margin-top:24px}.homeTitle{margin:0;font-size:24px;font-weight:800;letter-spacing:-.03em}.homeSub{margin-top:6px;color:var(--muted);font-size:13px}.homeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}.homeCard{appearance:none;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;cursor:pointer;transition:.18s ease}.homeCard:hover{transform:translateY(-2px);border-color:#cbd5e1;box-shadow:0 8px 24px rgba(17,24,39,.06)}.homeIcon{font-size:25px}.homeCardTitle{margin-top:12px;font-size:20px;font-weight:800}.homeTitleKeep{white-space:nowrap}.homeCardDesc{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.55}.homeBack{display:none;margin-bottom:10px;border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:800;cursor:pointer;padding:0}.homeMode .panel,.homeMode #status,.homeMode #grid{display:none}.homeMode #home{display:block}#home{display:none}.contactMail{color:#475467;font-weight:800;text-decoration:none}.contactMail:hover{color:var(--blue);text-decoration:underline}
 @media(max-width:680px){
-  .grid{grid-template-columns:1fr}\n  .homeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}\n  .homeCard{padding:15px}\n  .homeCardTitle{font-size:16px}\n  .homeCardDesc{font-size:11px}
+  .grid{grid-template-columns:1fr}
+  .homeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .homeCard{padding:15px}
+  .homeCardTitle{font-size:16px}
+  .homeTitleKeep{display:block}
+  .homeCardDesc{font-size:11px}
   .filters{grid-template-columns:1fr}
   .hero{
     display:block;
@@ -717,7 +724,7 @@ footer{
 <div class="homeGrid">
 <button class="homeCard" type="button" onclick="openHomeCategory('market')"><div class="homeIcon">📈</div><div class="homeCardTitle">시장지표</div><div class="homeCardDesc">한국·미국증시 · 환율 · 비철·귀금속 · 원유</div></button>
 <button class="homeCard" type="button" onclick="openHomeCategory('labor')"><div class="homeIcon">👷</div><div class="homeCardTitle">노임 · 인건비</div><div class="homeCardDesc">개별직종 노임단가 · 엔지니어링 · 최저임금</div></button>
-<button class="homeCard" type="button" onclick="openHomeCategory('pps')"><div class="homeIcon">🏗️</div><div class="homeCardTitle">간접공사비 제비율 적용기준</div><div class="homeCardDesc">산재·고용·건강보험료·산업안전보건관리비 · 일반관리비 · 이윤</div></button>
+<button class="homeCard" type="button" onclick="openHomeCategory('pps')"><div class="homeIcon">🏗️</div><div class="homeCardTitle">간접공사비 <span class="homeTitleKeep">제비율 적용기준</span></div><div class="homeCardDesc">산재·고용·건강보험료·산업안전보건관리비 · 일반관리비 · 이윤</div></button>
 <button class="homeCard" type="button" onclick="openHomeCategory('price_index')"><div class="homeIcon">📊</div><div class="homeCardTitle">물가 · 원가지수</div><div class="homeCardDesc">건설공사비지수 · 전기공사비지수 · 전선 및 케이블</div></button>
 </div></section>
 
@@ -2388,10 +2395,18 @@ function marketGroup(x){
   const sym=String(x.symbol||"").toUpperCase();
   if(["DJIA","NASDAQ","SP500"].includes(sym)) return "미국증시";
   if(["KOSPI","KOSDAQ"].includes(sym)) return "한국증시";
-  if(["USDKRW","JPYKRW","EURKRW","CNYKRW"].includes(sym)) return "환율";
+  if(["USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW"].includes(sym)) return "환율";
   if(["LMEALC","LMECOC","LMENIC","LMEZINC","GOLD","SILVER"].includes(sym)) return "비철·귀금속";
   if(["BRENTF","DUBAIF"].includes(sym)) return "에너지";
   return "기타";
+}
+function marketFlag(x){
+  const flags={USDKRW:"🇺🇸",JPYKRW:"🇯🇵",EURKRW:"🇪🇺",CNYKRW:"🇨🇳",GBPKRW:"🇬🇧",THBKRW:"🇹🇭"};
+  return flags[String(x.symbol||"").toUpperCase()]||"";
+}
+function marketEnglishName(x){
+  const names={LMECOC:"Copper",LMEALC:"Aluminium",LMENIC:"Nickel",LMEZINC:"Zinc",GOLD:"Gold",SILVER:"Silver"};
+  return names[String(x.symbol||"").toUpperCase()]||"";
 }
 function marketTabs(){
   const types=["전체","한국증시","미국증시","환율","비철·귀금속","에너지"];
@@ -2412,7 +2427,7 @@ function marketSection(){
   if(marketType!=="전체") a=a.filter(x=>marketGroup(x)===marketType);
   const terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
   a=a.filter(x=>{ const h=[x.name,x.symbol,marketGroup(x)].filter(Boolean).join(" ").toLowerCase(); return terms.every(t=>h.includes(t)); });
-  const order=["KOSPI","KOSDAQ","DJIA","NASDAQ","SP500","USDKRW","JPYKRW","EURKRW","CNYKRW","LMECOC","LMEALC","LMENIC","LMEZINC","GOLD","SILVER","BRENTF","DUBAIF"];
+  const order=["KOSPI","KOSDAQ","DJIA","NASDAQ","SP500","USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW","LMECOC","LMEALC","LMENIC","LMEZINC","GOLD","SILVER","BRENTF","DUBAIF"];
   a.sort((x,y)=>order.indexOf(x.symbol)-order.indexOf(y.symbol));
   const cards=a.map(x=>{
     const ch=Number(x.change_pct);
@@ -2420,7 +2435,9 @@ function marketSection(){
     const ct=Number.isFinite(ch)?`${ch>0?"+":""}${ch.toFixed(2)}%`:"-";
     const source=x.source||"-";
     const delay=source==="Yahoo Finance"?" · 지연 시세":"";
-    return `<article class="card marketCard"><div class="cat">${marketGroup(x)}</div><div class="name">${x.name||x.symbol||""}</div><div class="val">${fmt(x.value)} <span class="unit">${marketUnit(x)}</span></div><div class="marketChange ${c}">전일 대비 ${ct}</div><div class="marketDate">기준일 ${x.market_date||x.effective_date||"-"} · ${source}${delay}</div></article>`;
+    const flag=marketFlag(x);
+    const english=marketEnglishName(x);
+    return `<article class="card marketCard"><div class="cat">${marketGroup(x)}</div><div class="name">${flag?`<span class="marketFlag">${flag}</span>`:""}${x.name||x.symbol||""}${english?` <span class="marketEnglish">(${english})</span>`:""}</div><div class="val">${fmt(x.value)} <span class="unit">${marketUnit(x)}</span></div><div class="marketChange ${c}">전일 대비 ${ct}</div><div class="marketDate">기준일 ${x.market_date||x.effective_date||"-"} · ${source}${delay}</div></article>`;
   }).join("");
   return marketTabs()+cards;
 }
@@ -2982,7 +2999,7 @@ async function updateVisitorCount(s){
     if(standardsRes.error)
       throw standardsRes.error;
 
-    /* 시장지표 - market-worker가 저장한 최신 13종 */
+    /* 시장지표 - market-worker가 저장한 최신 19종 */
     const marketRes=await s
       .from("market_data")
       .select("*")
