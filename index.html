@@ -2393,7 +2393,7 @@ function minimumWageCard(data){
 ===================================================== */
 function marketGroup(x){
   const sym=String(x.symbol||"").toUpperCase();
-  if(["DJIA","NASDAQ","SP500"].includes(sym)) return "미국증시";
+  if(["DJIA","NASDAQ","SP500","SOX"].includes(sym)) return "미국증시";
   if(["KOSPI","KOSDAQ"].includes(sym)) return "한국증시";
   if(["USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW"].includes(sym)) return "환율";
   if(["LMEALC","LMECOC","LMENIC","LMEZINC","GOLD","SILVER"].includes(sym)) return "비철·귀금속";
