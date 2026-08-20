@@ -618,6 +618,23 @@ footer{
 .marketChange.up{background:#ecfdf3;color:var(--green)}
 .marketChange.down{background:#fef3f2;color:var(--red)}
 
+/* =====================================================
+   반도체 기업
+===================================================== */
+.semiconductorToolbar{grid-column:1/-1;display:flex;gap:7px;overflow-x:auto;padding:2px 0}
+.semiconductorSubTab{appearance:none;border:1px solid var(--line);background:#fff;color:#475467;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}
+.semiconductorSubTab.on{background:var(--dark);border-color:var(--dark);color:#fff}
+.companyCard{padding:16px}
+.companyHead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.companyCard .name{font-size:17px;line-height:1.35;margin-top:7px}
+.companyFlag{margin-right:6px;font-size:18px;vertical-align:-1px}
+.companyEnglish{color:var(--muted);font-size:11px;font-weight:600}
+.companyTicker{flex:0 0 auto;color:#98a2b3;font-size:10px;font-weight:800;margin-top:2px}
+.companySpecialty{min-height:20px;margin-top:5px;color:var(--muted);font-size:12px;line-height:1.45}
+.companyCard .val{font-size:25px;margin-top:10px}
+.companyDate{margin-top:9px;color:var(--muted);font-size:11px}
+.homeCard.semiconductorHome{grid-column:1/-1}
+
 
 /* HOME */
 .homeIntro{margin-top:24px}.homeTitle{margin:0;font-size:24px;font-weight:800;letter-spacing:-.03em}.homeSub{margin-top:6px;color:var(--muted);font-size:13px}.homeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}.homeCard{appearance:none;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;cursor:pointer;transition:.18s ease}.homeCard:hover{transform:translateY(-2px);border-color:#cbd5e1;box-shadow:0 8px 24px rgba(17,24,39,.06)}.homeIcon{font-size:25px}.homeCardTitle{margin-top:12px;font-size:20px;font-weight:800}.homeTitleKeep{white-space:nowrap}.homeCardDesc{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.55}.homeBack{display:none;margin-bottom:10px;border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:800;cursor:pointer;padding:0}.homeMode .panel,.homeMode #status,.homeMode #grid{display:none}.homeMode #home{display:block}#home{display:none}.contactMail{color:#475467;font-weight:800;text-decoration:none}.contactMail:hover{color:var(--blue);text-decoration:underline}
@@ -702,6 +719,9 @@ footer{
   .marketCard{padding:13px}
   .marketCard .name{font-size:15px}
   .marketCard .val{font-size:22px}
+  .companyCard{padding:13px}
+  .companyCard .name{font-size:15px}
+  .companyCard .val{font-size:21px}
 }
 </style>
 </head>
@@ -726,6 +746,7 @@ footer{
 <button class="homeCard" type="button" onclick="openHomeCategory('labor')"><div class="homeIcon">👷</div><div class="homeCardTitle">노임 · 인건비</div><div class="homeCardDesc">개별직종 노임단가 · 엔지니어링 · 최저임금</div></button>
 <button class="homeCard" type="button" onclick="openHomeCategory('pps')"><div class="homeIcon">🏗️</div><div class="homeCardTitle">간접공사비 <span class="homeTitleKeep">제비율 적용기준</span></div><div class="homeCardDesc">산재·고용·건강보험료·산업안전보건관리비 · 일반관리비 · 이윤</div></button>
 <button class="homeCard" type="button" onclick="openHomeCategory('price_index')"><div class="homeIcon">📊</div><div class="homeCardTitle">물가 · 원가지수</div><div class="homeCardDesc">건설공사비지수 · 전기공사비지수 · 전선 및 케이블</div></button>
+<button class="homeCard semiconductorHome" type="button" onclick="openHomeCategory('semiconductor')"><div class="homeIcon">🔬</div><div class="homeCardTitle">글로벌 반도체 기업</div><div class="homeCardDesc">설계·IP · 제조·파운드리 · 메모리 · 장비 · 웨이퍼·소재</div></button>
 </div></section>
 
 <section class="panel">
@@ -733,11 +754,12 @@ footer{
 
 <input
   id="q"
-  placeholder="예: 환율, 플랜트배관공, 최저임금, 건설공사비지수, 전선및케이블"
+  placeholder="예: 환율, 엔비디아, 플랜트배관공, 최저임금, 건설공사비지수"
 >
 
 <div class="tabs">
   <button class="tab on" data-c="market">시장지표</button>
+  <button class="tab" data-c="semiconductor">반도체 기업</button>
   <button class="tab" data-c="labor">개별직종 노임단가(공사)</button>
   <button class="tab" data-c="engineering">엔지니어링 노임단가(설계)</button>
   <button class="tab" data-c="pps">간접공사비 제비율 적용기준</button>
@@ -783,6 +805,8 @@ let rows=[];
 let cat="market";
 let marketRows=[];
 let marketType="전체";
+let semiconductorRows=[];
+let semiconductorType="전체";
 let engineeringType="전체보기";
 
 const q=document.getElementById("q");
@@ -2443,6 +2467,51 @@ function marketSection(){
 }
 
 /* =====================================================
+   글로벌 반도체 기업
+===================================================== */
+function semiconductorTabs(){
+  const types=["전체","설계·IP","제조·파운드리","메모리·스토리지","장비","웨이퍼·소재"];
+  return `<div class="semiconductorToolbar">${types.map(t=>`<button type="button" class="semiconductorSubTab ${semiconductorType===t?"on":""}" onclick="setSemiconductorType('${t}')">${t}</button>`).join("")}</div>`;
+}
+function setSemiconductorType(type){
+  semiconductorType=type;
+  render();
+}
+function companyCurrency(currency){
+  const units={KRW:"원",USD:"달러",JPY:"엔",EUR:"유로",TWD:"대만달러",NOK:"크로네",GBP:"파운드"};
+  return units[String(currency||"").toUpperCase()]||currency||"";
+}
+function semiconductorSection(){
+  let a=semiconductorRows.slice();
+  if(semiconductorType!=="전체") a=a.filter(x=>x.segment===semiconductorType);
+  const terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  a=a.filter(x=>{
+    const h=[x.name_ko,x.name_en,x.symbol,x.segment,x.specialty,x.country_code].filter(Boolean).join(" ").toLowerCase();
+    return terms.every(t=>h.includes(t));
+  });
+  const segmentOrder=["설계·IP","제조·파운드리","메모리·스토리지","장비","웨이퍼·소재"];
+  a.sort((x,y)=>{
+    const sx=segmentOrder.indexOf(x.segment), sy=segmentOrder.indexOf(y.segment);
+    if(sx!==sy) return sx-sy;
+    return String(x.name_ko||"").localeCompare(String(y.name_ko||""),"ko");
+  });
+  const cards=a.map(x=>{
+    const ch=Number(x.change_pct);
+    const c=Number.isFinite(ch)?(ch>0?"up":ch<0?"down":""):"";
+    const ct=Number.isFinite(ch)?`${ch>0?"+":""}${ch.toFixed(2)}%`:"-";
+    return `<article class="card companyCard">
+      <div class="companyHead"><div class="cat">${x.segment||"반도체 기업"}</div><div class="companyTicker">${x.yahoo_symbol||x.symbol||""}</div></div>
+      <div class="name"><span class="companyFlag">${x.country_flag||""}</span>${x.name_ko||x.name_en||x.symbol||""}${x.name_en&&x.name_en!==x.name_ko?` <span class="companyEnglish">(${x.name_en})</span>`:""}</div>
+      <div class="companySpecialty">${x.specialty||""}</div>
+      <div class="val">${fmt(x.value)} <span class="unit">${companyCurrency(x.currency)}</span></div>
+      <div class="marketChange ${c}">전일 대비 ${ct}</div>
+      <div class="companyDate">기준일 ${x.market_date||"-"} · ${x.source||"Yahoo Finance"} · 지연 시세</div>
+    </article>`;
+  }).join("");
+  return semiconductorTabs()+cards;
+}
+
+/* =====================================================
    메인 렌더
 ===================================================== */
 
@@ -2452,6 +2521,12 @@ function render(){
     grid.classList.add("marketMode");
     grid.innerHTML=marketSection() || '<div class="empty">시장지표 데이터가 없습니다.</div>';
     status.textContent=`${marketRows.length.toLocaleString()}개 시장지표 · 최신 기준`;
+    return;
+  }
+  if(cat==="semiconductor"){
+    grid.classList.add("marketMode");
+    grid.innerHTML=semiconductorSection() || '<div class="empty">반도체 기업 데이터가 없습니다.</div>';
+    status.textContent=`${semiconductorRows.length.toLocaleString()}개 글로벌 반도체 기업 · 최신 기준`;
     return;
   }
   grid.classList.remove("marketMode");
@@ -3014,6 +3089,23 @@ async function updateVisitorCount(s){
         if(!mm.has(x.symbol)) mm.set(x.symbol,x);
       });
       marketRows=[...mm.values()];
+    }
+
+    /* 글로벌 반도체 기업 - semiconductor-worker 최신 시세 */
+    const semiconductorRes=await s
+      .from("semiconductor_companies")
+      .select("*")
+      .order("market_date",{ascending:false});
+
+    if(semiconductorRes.error){
+      console.warn("semiconductor_companies load error",semiconductorRes.error);
+      semiconductorRows=[];
+    }else{
+      const sm=new Map();
+      (semiconductorRes.data||[]).forEach(x=>{
+        if(!sm.has(x.symbol)) sm.set(x.symbol,x);
+      });
+      semiconductorRows=[...sm.values()];
     }
 
 
