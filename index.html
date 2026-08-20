@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cost Diary | Cost Reference</title>
-<meta name="description" content="시장지표·노임단가·법정경비·물가지수 등 구매·건설 원가 기준정보를 한눈에 조회하세요.">
+<meta name="description" content="시장지표·노임단가·법정경비·물가지수 등 원가·시장 기준정보를 한눈에 조회하세요.">
 <link rel="canonical" href="https://costref.kr/">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Cost Diary">
-<meta property="og:title" content="Cost Diary - 구매, 표준원가 기준정보">
+<meta property="og:title" content="Cost Diary - 원가·시장 기준정보 통합조회">
 <meta property="og:description" content="시장지표·정부기준노임단가·법정경비·물가지수 등 한눈에">
 <meta property="og:url" content="https://costref.kr/">
 <meta property="og:image" content="https://costref.kr/cost-diary-og.png">
@@ -17,7 +17,7 @@
 <meta property="og:image:height" content="630">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Cost Diary - 구매, 표준원가 기준정보">
+<meta name="twitter:title" content="Cost Diary - 원가·시장 기준정보 통합조회">
 <meta name="twitter:description" content="시장지표·노임단가·법정경비·물가지수 등 한눈에">
 <meta name="twitter:image" content="https://costref.kr/cost-diary-og.png">
 
@@ -51,8 +51,7 @@ body{
 
 .hero{
   display:flex;
-  justify-content:space-between;
-  gap:20px;
+  justify-content:flex-start;
   align-items:flex-start;
   min-height:250px;
   padding:30px;
@@ -86,17 +85,6 @@ body{
   font-size:16px;
   line-height:1.55;
   font-weight:700;
-}
-
-.brand{
-  background:rgba(255,255,255,.12);
-  color:white;
-  border:1px solid rgba(255,255,255,.28);
-  backdrop-filter:blur(6px);
-  padding:9px 12px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:900;
 }
 
 .panel{
@@ -645,7 +633,6 @@ footer{
   }
   .hero h1{font-size:30px;max-width:520px}
   .desc{font-size:14px}
-  .brand{display:inline-block;margin-top:12px}
 
   .rateTableCard{
     padding:14px;
@@ -722,7 +709,6 @@ footer{
     <h1>Cost Diary</h1>
     <div class="desc">원가·시장 기준정보 통합조회</div>
   </div>
-  <div class="brand">Cost Reference</div>
 </header>
 
 <section id="home" class="homeIntro">
