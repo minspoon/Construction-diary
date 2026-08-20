@@ -4,7 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cost Diary | Cost Reference</title>
-<meta name="description" content="구매 · 표준가격 및 원가 기준 통합조회">
+<meta name="description" content="시장지표·노임단가·법정경비·물가지수 등 구매·건설 원가 기준정보를 한눈에 조회하세요.">
+<link rel="canonical" href="https://costref.kr/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cost Diary">
+<meta property="og:title" content="Cost Diary - 구매, 건설 원가 기준정보">
+<meta property="og:description" content="시장지표·노임단가·법정경비·물가지수 등 한눈에">
+<meta property="og:url" content="https://costref.kr/">
+<meta property="og:image" content="https://costref.kr/cost-diary-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cost Diary - 구매, 건설 원가 기준정보">
+<meta name="twitter:description" content="시장지표·노임단가·법정경비·물가지수 등 한눈에">
+<meta name="twitter:image" content="https://costref.kr/cost-diary-og.png">
 
 <style>
 :root{
@@ -37,31 +52,46 @@ body{
 .hero{
   display:flex;
   justify-content:space-between;
-  gap:15px;
+  gap:20px;
   align-items:flex-start;
+  min-height:250px;
+  padding:30px;
+  border-radius:24px;
+  overflow:hidden;
+  color:#fff;
+  background:
+    linear-gradient(90deg,rgba(7,16,34,.46) 0%,rgba(7,16,34,.25) 44%,rgba(7,16,34,.06) 100%),
+    url("./cost-diary-bg.png") center/cover no-repeat;
+  box-shadow:0 14px 34px rgba(15,23,42,.16);
 }
 
 .kicker{
   font-size:11px;
   font-weight:900;
-  color:var(--blue);
+  color:#93c5fd;
   letter-spacing:.12em;
 }
 
-h1{
+.hero h1{
   margin:6px 0;
-  font-size:clamp(34px,7vw,50px);
+  max-width:650px;
+  font-size:clamp(31px,5vw,46px);
+  line-height:1.12;
   letter-spacing:-.05em;
 }
 
 .desc{
-  color:var(--muted);
-  font-size:14px;
+  color:#e2e8f0;
+  font-size:16px;
+  line-height:1.55;
+  font-weight:700;
 }
 
 .brand{
-  background:var(--dark);
+  background:rgba(255,255,255,.12);
   color:white;
+  border:1px solid rgba(255,255,255,.28);
+  backdrop-filter:blur(6px);
   padding:9px 12px;
   border-radius:999px;
   font-size:12px;
@@ -603,7 +633,17 @@ footer{
 @media(max-width:680px){
   .grid{grid-template-columns:1fr}\n  .homeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}\n  .homeCard{padding:15px}\n  .homeCardTitle{font-size:16px}\n  .homeCardDesc{font-size:11px}
   .filters{grid-template-columns:1fr}
-  .hero{display:block}
+  .hero{
+    display:block;
+    min-height:210px;
+    padding:23px 20px;
+    border-radius:20px;
+    background:
+      linear-gradient(90deg,rgba(7,16,34,.62) 0%,rgba(7,16,34,.35) 70%,rgba(7,16,34,.10) 100%),
+      url("./cost-diary-bg.png") center/cover no-repeat;
+  }
+  .hero h1{font-size:30px;max-width:520px}
+  .desc{font-size:14px}
   .brand{display:inline-block;margin-top:12px}
 
   .rateTableCard{
@@ -678,8 +718,8 @@ footer{
 <header class="hero">
   <div>
     <div class="kicker">COST REFERENCE DATA</div>
-    <h1>Cost Diary</h1>
-    <div class="desc">구매 · 표준가격 및 원가 기준 통합조회</div>
+    <h1>Cost Diary - 구매, 건설 원가 기준정보</h1>
+    <div class="desc">시장지표·노임단가·법정경비·물가지수 등 한눈에</div>
   </div>
   <div class="brand">Cost Reference</div>
 </header>
