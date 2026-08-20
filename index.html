@@ -768,7 +768,7 @@ footer{
 <main id="grid" class="grid"></main>
 
 <footer>
-  <div><strong>Cost Diary</strong> · 구매·건설 원가 기준정보<br>공식 공표자료 기준 · 출처 및 적용일 관리 · 문의: <a class="contactMail" href="mailto:minsung320@gmail.com">minsung320@gmail.com</a></div>
+  <div><strong>Cost Diary</strong> · 원가·시장 기준정보<br>공식 공표자료 기준 · 출처 및 적용일 관리 · 문의: <a class="contactMail" href="mailto:minsung320@gmail.com">minsung320@gmail.com</a></div>
   <div id="visitorCount" class="visitorCount">누적 방문 집계중...</div>
 </footer>
 
@@ -2405,7 +2405,7 @@ function marketFlag(x){
   return flags[String(x.symbol||"").toUpperCase()]||"";
 }
 function marketEnglishName(x){
-  const names={LMECOC:"Copper",LMEALC:"Aluminium",LMENIC:"Nickel",LMEZINC:"Zinc",GOLD:"Gold",SILVER:"Silver"};
+  const names={SOX:"SOX",LMECOC:"Copper",LMEALC:"Aluminium",LMENIC:"Nickel",LMEZINC:"Zinc",GOLD:"Gold",SILVER:"Silver"};
   return names[String(x.symbol||"").toUpperCase()]||"";
 }
 function marketTabs(){
@@ -2427,7 +2427,7 @@ function marketSection(){
   if(marketType!=="전체") a=a.filter(x=>marketGroup(x)===marketType);
   const terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
   a=a.filter(x=>{ const h=[x.name,x.symbol,marketGroup(x)].filter(Boolean).join(" ").toLowerCase(); return terms.every(t=>h.includes(t)); });
-  const order=["KOSPI","KOSDAQ","DJIA","NASDAQ","SP500","USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW","LMECOC","LMEALC","LMENIC","LMEZINC","GOLD","SILVER","BRENTF","DUBAIF"];
+  const order=["KOSPI","KOSDAQ","DJIA","NASDAQ","SP500","SOX","USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW","LMECOC","LMEALC","LMENIC","LMEZINC","GOLD","SILVER","BRENTF","DUBAIF"];
   a.sort((x,y)=>order.indexOf(x.symbol)-order.indexOf(y.symbol));
   const cards=a.map(x=>{
     const ch=Number(x.change_pct);
@@ -2999,7 +2999,7 @@ async function updateVisitorCount(s){
     if(standardsRes.error)
       throw standardsRes.error;
 
-    /* 시장지표 - market-worker가 저장한 최신 19종 */
+    /* 시장지표 - market-worker가 저장한 최신 20종 */
     const marketRes=await s
       .from("market_data")
       .select("*")
