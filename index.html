@@ -723,6 +723,8 @@ footer{
   .companyCard .name{font-size:15px}
   .companyCard .val{font-size:21px}
 }
+
+.filters[hidden]{display:none!important}
 </style>
 </head>
 
@@ -768,7 +770,7 @@ footer{
   <button class="tab" data-c="all">전체</button>
 </div>
 
-<div class="filters">
+<div class="filters" hidden aria-hidden="true">
 
 <select id="year">
   <option value="latest">최신 기준</option>
