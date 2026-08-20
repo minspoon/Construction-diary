@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cost Diary | Cost Reference</title>
-<meta name="description" content="구매·공사 원가 기준정보 통합조회">
+<meta name="description" content="구매 · 표준가격 및 원가 기준 통합조회">
 
 <style>
 :root{
@@ -679,33 +679,34 @@ footer{
   <div>
     <div class="kicker">COST REFERENCE DATA</div>
     <h1>Cost Diary</h1>
-    <div class="desc">구매·공사 원가 기준정보 통합조회</div>
+    <div class="desc">구매 · 표준가격 및 원가 기준 통합조회</div>
   </div>
   <div class="brand">Cost Reference</div>
 </header>
 
 <section id="home" class="homeIntro">
-<h2 class="homeTitle">원하는 기준정보를 선택하세요</h2>
+<h2 class="homeTitle">아래 원하는 기준정보를 조회하세요</h2>
 <div class="homeSub">시장지표부터 노임·법정경비·물가지수까지 빠르게 조회할 수 있습니다.</div>
 <div class="homeGrid">
 <button class="homeCard" type="button" onclick="openHomeCategory('market')"><div class="homeIcon">📈</div><div class="homeCardTitle">시장지표</div><div class="homeCardDesc">미국증시 · 환율 · LME 비철금속 · 원유</div></button>
 <button class="homeCard" type="button" onclick="openHomeCategory('labor')"><div class="homeIcon">👷</div><div class="homeCardTitle">노임 · 인건비</div><div class="homeCardDesc">개별직종 노임단가 · 엔지니어링 · 최저임금</div></button>
-<button class="homeCard" type="button" onclick="openHomeCategory('pps')"><div class="homeIcon">🏗️</div><div class="homeCardTitle">공사 원가 · 법정경비</div><div class="homeCardDesc">간접노무비 · 산업안전보건관리비 · 일반관리비 · 이윤</div></button>
+<button class="homeCard" type="button" onclick="openHomeCategory('pps')"><div class="homeIcon">🏗️</div><div class="homeCardTitle">간접공사비 제비율 적용기준</div><div class="homeCardDesc">간접노무비 · 산업안전보건관리비 · 일반관리비 · 이윤</div></button>
 <button class="homeCard" type="button" onclick="openHomeCategory('price_index')"><div class="homeIcon">📊</div><div class="homeCardTitle">물가 · 원가지수</div><div class="homeCardDesc">건설공사비지수 · 전기공사비지수 · 전선 및 케이블</div></button>
 </div></section>
 
-<section class="panel">\n<button id="homeBack" class="homeBack" type="button" onclick="showHome()">← 카테고리로 돌아가기</button>
+<section class="panel">
+<button id="homeBack" class="homeBack" type="button" onclick="showHome()">← 카테고리로 돌아가기</button>
 
 <input
   id="q"
-  placeholder="예: 플랜트배관공, 최저임금, 건설공사비지수, 전선및케이블"
+  placeholder="예: 환율, 플랜트배관공, 최저임금, 건설공사비지수, 전선및케이블"
 >
 
 <div class="tabs">
   <button class="tab on" data-c="market">시장지표</button>
   <button class="tab" data-c="labor">개별직종 노임단가(공사)</button>
-  <button class="tab" data-c="engineering">엔지니어링(설계)</button>
-  <button class="tab" data-c="pps">법정경비</button>
+  <button class="tab" data-c="engineering">엔지니어링 노임단가(설계)</button>
+  <button class="tab" data-c="pps">간접공사비 제비율 적용기준</button>
   <button class="tab" data-c="price_index">물가지수</button>
   <button class="tab" data-c="minimum_wage">최저임금</button>
   <button class="tab" data-c="all">전체</button>
