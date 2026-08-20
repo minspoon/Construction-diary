@@ -597,8 +597,11 @@ footer{
 .marketChange.up{background:#ecfdf3;color:var(--green)}
 .marketChange.down{background:#fef3f2;color:var(--red)}
 
+
+/* HOME */
+.homeIntro{margin-top:24px}.homeTitle{margin:0;font-size:24px;font-weight:800;letter-spacing:-.03em}.homeSub{margin-top:6px;color:var(--muted);font-size:13px}.homeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}.homeCard{appearance:none;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;cursor:pointer;transition:.18s ease}.homeCard:hover{transform:translateY(-2px);border-color:#cbd5e1;box-shadow:0 8px 24px rgba(17,24,39,.06)}.homeIcon{font-size:25px}.homeCardTitle{margin-top:12px;font-size:20px;font-weight:800}.homeCardDesc{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.55}.homeBack{display:none;margin-bottom:10px;border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:800;cursor:pointer;padding:0}.homeMode .panel,.homeMode #status,.homeMode #grid{display:none}.homeMode #home{display:block}#home{display:none}.contactMail{color:#475467;font-weight:800;text-decoration:none}.contactMail:hover{color:var(--blue);text-decoration:underline}
 @media(max-width:680px){
-  .grid{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}\n  .homeGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}\n  .homeCard{padding:15px}\n  .homeCardTitle{font-size:16px}\n  .homeCardDesc{font-size:11px}
   .filters{grid-template-columns:1fr}
   .hero{display:block}
   .brand{display:inline-block;margin-top:12px}
@@ -668,7 +671,7 @@ footer{
 </style>
 </head>
 
-<body>
+<body class="homeMode">
 
 <div class="wrap">
 
@@ -681,7 +684,17 @@ footer{
   <div class="brand">Cost Reference</div>
 </header>
 
-<section class="panel">
+<section id="home" class="homeIntro">
+<h2 class="homeTitle">원하는 기준정보를 선택하세요</h2>
+<div class="homeSub">시장지표부터 노임·법정경비·물가지수까지 빠르게 조회할 수 있습니다.</div>
+<div class="homeGrid">
+<button class="homeCard" type="button" onclick="openHomeCategory('market')"><div class="homeIcon">📈</div><div class="homeCardTitle">시장지표</div><div class="homeCardDesc">미국증시 · 환율 · LME 비철금속 · 원유</div></button>
+<button class="homeCard" type="button" onclick="openHomeCategory('labor')"><div class="homeIcon">👷</div><div class="homeCardTitle">노임 · 인건비</div><div class="homeCardDesc">개별직종 노임단가 · 엔지니어링 · 최저임금</div></button>
+<button class="homeCard" type="button" onclick="openHomeCategory('pps')"><div class="homeIcon">🏗️</div><div class="homeCardTitle">공사 원가 · 법정경비</div><div class="homeCardDesc">간접노무비 · 산업안전보건관리비 · 일반관리비 · 이윤</div></button>
+<button class="homeCard" type="button" onclick="openHomeCategory('price_index')"><div class="homeIcon">📊</div><div class="homeCardTitle">물가 · 원가지수</div><div class="homeCardDesc">건설공사비지수 · 전기공사비지수 · 전선 및 케이블</div></button>
+</div></section>
+
+<section class="panel">\n<button id="homeBack" class="homeBack" type="button" onclick="showHome()">← 카테고리로 돌아가기</button>
 
 <input
   id="q"
@@ -720,7 +733,7 @@ footer{
 <main id="grid" class="grid"></main>
 
 <footer>
-  <div>공식 공표자료 기준 · 출처 및 적용일 관리 · 노임/최저임금/법정경비/엔지니어링/월별 물가지수 변동률 자동 계산</div>
+  <div><strong>Cost Diary</strong> · 구매·건설 원가 기준정보<br>공식 공표자료 기준 · 출처 및 적용일 관리 · 문의: <a class="contactMail" href="mailto:minsung320@gmail.com">minsung320@gmail.com</a></div>
   <div id="visitorCount" class="visitorCount">누적 방문 집계중...</div>
 </footer>
 
@@ -2804,6 +2817,24 @@ function render(){
     '<div class="empty">검색 결과가 없습니다.</div>';
 }
 
+
+/* HOME 이동 */
+function showHome(){
+  document.body.classList.add("homeMode");
+  document.getElementById("homeBack").style.display="none";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function openHomeCategory(type){
+  document.body.classList.remove("homeMode");
+  document.getElementById("homeBack").style.display="inline-block";
+  cat=type;
+  document.querySelectorAll(".tab").forEach(z=>z.classList.toggle("on",z.dataset.c===type));
+  q.value="";
+  yf.value="latest";
+  pf.value="all";
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
 
 /* =====================================================
    이벤트
