@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Cost Diary ENERGY-CARD-FIX-V3: 도시가스 단일 카드 통합 -->
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -763,7 +764,7 @@ footer{
 
 <input
   id="q"
-  placeholder="예: 환율, 엔비디아, 플랜트배관공, 최저임금, 건설공사비지수"
+  placeholder="예: 환율, 엔비디아, 산업용 도시가스, 플랜트배관공, 최저임금"
 >
 
 <div class="tabs">
@@ -2425,12 +2426,15 @@ function minimumWageCard(data){
    시장지표
 ===================================================== */
 function marketGroup(x){
+  if(x.category==="energy") return "에너지";
   const sym=String(x.symbol||"").toUpperCase();
+  const name=String(x.name||"");
+  if(sym.includes("CITYGAS")||sym.includes("LNG_RAW")||name.includes("도시가스")||name.includes("LNG 원료비")) return "에너지";
   if(["DJIA","NASDAQ","SP500","SOX"].includes(sym)) return "미국증시";
   if(["KOSPI","KOSDAQ"].includes(sym)) return "한국증시";
   if(["USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW"].includes(sym)) return "환율";
   if(["LMEALC","LMECOC","LMENIC","LMEZINC","GOLD","SILVER"].includes(sym)) return "비철·귀금속";
-  if(["BRENTF","DUBAIF"].includes(sym)) return "에너지";
+  if(["BRENTF","DUBAIF","LNG_RAW_INDUSTRIAL","CITYGAS_INDUSTRIAL"].includes(sym)) return "에너지";
   return "기타";
 }
 function marketFlag(x){
@@ -2448,7 +2452,9 @@ function marketTabs(){
 function setMarketType(type){ marketType=type; render(); }
 function marketUnit(x){
   const sym=String(x.symbol||"").toUpperCase();
+  const name=String(x.name||"");
   const g=marketGroup(x);
+  if(sym.includes("CITYGAS")||sym.includes("LNG_RAW")||name.includes("도시가스")||name.includes("LNG 원료비")) return "원/MJ";
   if(g==="환율") return "원";
   if(["LMEALC","LMECOC","LMENIC","LMEZINC"].includes(sym)) return "USD/톤";
   if(["GOLD","SILVER"].includes(sym)) return "USD/온스";
@@ -2457,11 +2463,16 @@ function marketUnit(x){
 }
 function marketSection(){
   let a=marketRows.slice();
+  const isLngRaw=x=>String(x.symbol||"").toUpperCase().includes("LNG_RAW")||String(x.name||"").includes("LNG 원료비");
+  const isCityGas=x=>String(x.symbol||"").toUpperCase().includes("CITYGAS")||String(x.name||"").includes("도시가스 도매요금");
+  const lngRow=a.find(isLngRaw);
+  a=a.filter(x=>!isLngRaw(x));
   if(marketType!=="전체") a=a.filter(x=>marketGroup(x)===marketType);
   const terms=q.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  a=a.filter(x=>{ const h=[x.name,x.symbol,marketGroup(x)].filter(Boolean).join(" ").toLowerCase(); return terms.every(t=>h.includes(t)); });
-  const order=["KOSPI","KOSDAQ","DJIA","NASDAQ","SP500","SOX","USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW","LMECOC","LMEALC","LMENIC","LMEZINC","GOLD","SILVER","BRENTF","DUBAIF"];
-  a.sort((x,y)=>order.indexOf(x.symbol)-order.indexOf(y.symbol));
+  a=a.filter(x=>{ const h=[x.name,x.symbol,x.subcategory,marketGroup(x)].filter(Boolean).join(" ").toLowerCase(); return terms.every(t=>h.includes(t)); });
+  const order=["KOSPI","KOSDAQ","DJIA","NASDAQ","SP500","SOX","USDKRW","JPYKRW","EURKRW","CNYKRW","GBPKRW","THBKRW","LMECOC","LMEALC","LMENIC","LMEZINC","GOLD","SILVER","BRENTF","DUBAIF","LNG_RAW_INDUSTRIAL","CITYGAS_INDUSTRIAL"];
+  const orderNo=x=>{const i=order.indexOf(x.symbol);return i<0?999:i;};
+  a.sort((x,y)=>orderNo(x)-orderNo(y)||(x.name||"").localeCompare(y.name||"","ko"));
   const cards=a.map(x=>{
     const ch=Number(x.change_pct);
     const c=Number.isFinite(ch)?(ch>0?"up":ch<0?"down":""):"";
@@ -2470,7 +2481,12 @@ function marketSection(){
     const delay=source==="Yahoo Finance"?" · 지연 시세":"";
     const flag=marketFlag(x);
     const english=marketEnglishName(x);
-    return `<article class="card marketCard"><div class="cat">${marketGroup(x)}</div><div class="name">${flag?`<span class="marketFlag">${flag}</span>`:""}${x.name||x.symbol||""}${english?` <span class="marketEnglish">(${english})</span>`:""}</div><div class="val">${fmt(x.value)} <span class="unit">${marketUnit(x)}</span></div><div class="marketChange ${c}">전일 대비 ${ct}</div><div class="marketDate">기준일 ${x.market_date||x.effective_date||"-"} · ${source}${delay}</div></article>`;
+    const officialEnergy=isCityGas(x);
+    const lngValue=lngRow&&Number.isFinite(Number(lngRow.value))?Number(lngRow.value):23.8536;
+    const supplyCost=officialEnergy&&Number.isFinite(Number(x.value))?Number(x.value)-lngValue:1.2360;
+    const detail=officialEnergy?`<div class="sub">LNG 원료비 ${fmt(lngValue)} + 가스공사 공급비용 ${fmt(supplyCost)} · 부가세·지역 소매공급비 별도</div>`:"";
+    const change=officialEnergy?`<div class="marketChange">공식 공표요금</div>`:`<div class="marketChange ${c}">전일 대비 ${ct}</div>`;
+    return `<article class="card marketCard"><div class="cat">${marketGroup(x)}</div><div class="name">${flag?`<span class="marketFlag">${flag}</span>`:""}${x.name||x.symbol||""}${english?` <span class="marketEnglish">(${english})</span>`:""}</div>${detail}<div class="val">${fmt(x.value)} <span class="unit">${marketUnit(x)}</span></div>${change}<div class="marketDate">기준일 ${x.market_date||x.effective_date||"-"} · ${source}${delay}</div></article>`;
   }).join("");
   return marketTabs()+cards;
 }
@@ -2529,7 +2545,8 @@ function render(){
   if(cat==="market"){
     grid.classList.add("marketMode");
     grid.innerHTML=marketSection() || '<div class="empty">시장지표 데이터가 없습니다.</div>';
-    status.textContent=`${marketRows.length.toLocaleString()}개 시장지표 · 최신 기준`;
+    const visibleMarketCount=marketRows.filter(x=>!(String(x.symbol||"").toUpperCase().includes("LNG_RAW")||String(x.name||"").includes("LNG 원료비"))).length;
+    status.textContent=`${visibleMarketCount.toLocaleString()}개 시장지표 · 최신 기준`;
     return;
   }
   if(cat==="semiconductor"){
